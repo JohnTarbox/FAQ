@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FAQ &amp; Glossary — Heritage Editorial Mockup</title>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=DM+Sans:ital,wght@0,300..700;1,300..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   CSS RESET & VARIABLES
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --color-cream: #FAF7F2;
+  --color-warm-white: #FFFFFF;
+  --color-ink: #1A1A1A;
+  --color-ink-light: #4A4A4A;
+  --color-ink-muted: #8A8A8A;
+  --color-rust: #B5451B;
+  --color-rust-light: #D4713A;
+  --color-rust-pale: #FDF0E9;
+  --color-sage: #5B7B5E;
+  --color-sage-light: #E8F0E8;
+  --color-gold: #C4962C;
+  --color-gold-pale: #FEF9EE;
+  --color-border: #E5E0D8;
+  --color-border-dark: #C8C2B8;
+
+  --color-status-draft: #8A8A8A;
+  --color-status-pending: #C4962C;
+  --color-status-published: #5B7B5E;
+  --color-status-rejected: #B5451B;
+
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Source Serif 4', serif;
+  --font-ui: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --shadow-sm: 0 1px 3px rgba(26,26,26,0.06);
+  --shadow-md: 0 4px 12px rgba(26,26,26,0.08);
+  --shadow-lg: 0 8px 24px rgba(26,26,26,0.12);
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-cream);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--color-rust); text-decoration: none; transition: color 0.15s; }
+a:hover { color: var(--color-rust-light); }
+
+/* ============================================================
+   MOCKUP TAB NAVIGATION (top bar to switch views)
+   ============================================================ */
+.mockup-tabs {
+  position: sticky; top: 0; z-index: 1000;
+  background: var(--color-ink);
+  display: flex; flex-wrap: wrap; gap: 2px;
+  padding: 6px 12px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+}
+.mockup-tabs button {
+  background: transparent; border: none; color: rgba(255,255,255,0.55);
+  padding: 6px 14px; cursor: pointer; border-radius: var(--radius-sm);
+  font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.mockup-tabs button:hover { background: rgba(255,255,255,0.08); color: #fff; }
+.mockup-tabs button.active { background: var(--color-rust); color: #fff; }
+
+.page-view { display: none; }
+.page-view.active { display: block; }
+
+/* ============================================================
+   PUBLIC LAYOUT
+   ============================================================ */
+.public-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-ink-muted);
+  padding: 16px 0;
+}
+.breadcrumb a { color: var(--color-ink-muted); }
+.breadcrumb a:hover { color: var(--color-rust); }
+.breadcrumb span { margin: 0 6px; }
+
+/* Hero */
+.hero {
+  padding: 48px 0 36px;
+  position: relative;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: -20px -9999px; z-index: -1;
+  background: linear-gradient(180deg, var(--color-cream) 0%, rgba(250,247,242,0) 100%);
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+  font-optical-sizing: auto;
+}
+
+/* Search bar */
+.search-bar {
+  position: relative;
+  max-width: 560px;
+}
+.search-bar input {
+  width: 100%;
+  padding: 14px 18px 14px 48px;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-warm-white);
+  color: var(--color-ink);
+  transition: border-color 0.15s;
+}
+.search-bar input:focus { outline: none; border-color: var(--color-rust); }
+.search-bar input::placeholder { color: var(--color-ink-muted); }
+.search-bar .search-icon {
+  position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+  color: var(--color-ink-muted); pointer-events: none;
+}
+
+/* Category pills */
+.category-pills {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 24px 0 8px;
+  font-family: var(--font-ui);
+}
+.pill {
+  display: inline-block;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 100px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-warm-white);
+  color: var(--color-ink-light);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.pill:hover { border-color: var(--color-rust); color: var(--color-rust); }
+.pill.active {
+  background: var(--color-rust);
+  border-color: var(--color-rust);
+  color: #fff;
+}
+.pill-sm {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  border-radius: 100px;
+  display: inline-block;
+}
+.pill-category {
+  background: var(--color-rust-pale);
+  color: var(--color-rust);
+}
+.pill-tag {
+  background: var(--color-sage-light);
+  color: var(--color-sage);
+}
+.pill-gold {
+  background: var(--color-gold-pale);
+  color: var(--color-gold);
+}
+
+/* FAQ Cards */
+.faq-list { display: flex; flex-direction: column; gap: 12px; padding: 24px 0; }
+.faq-card {
+  background: var(--color-warm-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.faq-card:hover { box-shadow: var(--shadow-sm); border-color: var(--color-border-dark); }
+.faq-card.featured {
+  background: var(--color-gold-pale);
+  border-left: 4px solid var(--color-gold);
+  border-color: var(--color-gold);
+}
+.faq-card .question {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+.faq-card .question a { color: var(--color-ink); }
+.faq-card .question a:hover { color: var(--color-rust); }
+.faq-card .preview {
+  font-size: 15px;
+  color: var(--color-ink-light);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.faq-card .meta {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink-muted);
+}
+
+/* Pagination */
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: 4px; padding: 32px 0;
+  font-family: var(--font-ui); font-size: 14px;
+}
+.pagination button, .pagination .page-num {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-warm-white);
+  color: var(--color-ink-light);
+  cursor: pointer;
+  font-family: var(--font-ui); font-size: 14px;
+  transition: all 0.15s;
+}
+.pagination .page-num:hover { border-color: var(--color-rust); color: var(--color-rust); }
+.pagination .page-num.active {
+  background: var(--color-rust); border-color: var(--color-rust); color: #fff;
+}
+
+/* FAQ Detail */
+.faq-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 48px;
+  padding: 16px 0 64px;
+}
+.faq-detail-body h1 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+.faq-detail-body .tag-row { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+.faq-detail-body .answer { font-size: 17px; line-height: 1.75; }
+.faq-detail-body .answer p { margin-bottom: 16px; }
+.faq-detail-body .answer ul, .faq-detail-body .answer ol {
+  margin: 12px 0 16px 24px;
+}
+.faq-detail-body .answer li { margin-bottom: 6px; }
+.faq-detail-body .answer strong { font-weight: 600; }
+.faq-detail-body .answer a { text-decoration: underline; text-underline-offset: 2px; }
+
+.faq-sidebar { padding-top: 8px; }
+.sidebar-section {
+  background: var(--color-warm-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+.sidebar-section h3 {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted);
+  margin-bottom: 14px;
+}
+.sidebar-section ul { list-style: none; }
+.sidebar-section li { margin-bottom: 10px; }
+.sidebar-section li a {
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--color-ink-light);
+}
+.sidebar-section li a:hover { color: var(--color-rust); }
+
+.helpful-row {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-ui); font-size: 14px;
+  color: var(--color-ink-light);
+}
+.helpful-btn {
+  padding: 6px 16px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-warm-white);
+  font-family: var(--font-ui); font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+}
+.helpful-btn:hover { border-color: var(--color-sage); color: var(--color-sage); }
+
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-ui); font-size: 14px; font-weight: 500;
+  color: var(--color-rust);
+  margin-top: 32px;
+}
+
+/* ============================================================
+   GLOSSARY
+   ============================================================ */
+.az-bar {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  padding: 16px 0;
+  position: sticky; top: 44px; z-index: 100;
+  background: var(--color-cream);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: 24px;
+}
+.az-bar a {
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-ui); font-size: 13px; font-weight: 600;
+  color: var(--color-ink-light);
+  border-radius: var(--radius-sm);
+  transition: all 0.15s;
+}
+.az-bar a:hover { background: var(--color-rust-pale); color: var(--color-rust); }
+.az-bar a.active { background: var(--color-rust); color: #fff; }
+.az-bar a.dimmed { color: var(--color-ink-muted); opacity: 0.4; pointer-events: none; }
+
+.glossary-group { margin-bottom: 36px; }
+.glossary-group h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-ink);
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: 16px;
+}
+.glossary-group dl { }
+.glossary-group dt {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-bottom: 4px;
+}
+.glossary-group dt .abbr {
+  font-weight: 400;
+  color: var(--color-ink-muted);
+  font-size: 14px;
+}
+.glossary-group dd {
+  font-size: 15px;
+  color: var(--color-ink-light);
+  line-height: 1.6;
+  margin-bottom: 20px;
+  padding-left: 0;
+}
+.glossary-group dd .read-more {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 6px;
+}
+
+/* Glossary Term Detail */
+.term-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  padding: 16px 0 64px;
+  max-width: 720px;
+}
+.term-detail-layout h1 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.term-expansion {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  color: var(--color-ink-muted);
+  font-style: italic;
+  margin-bottom: 16px;
+}
+.short-def-box {
+  background: var(--color-sage-light);
+  border-left: 4px solid var(--color-sage);
+  padding: 16px 20px;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.term-body { font-size: 17px; line-height: 1.75; }
+.term-body p { margin-bottom: 16px; }
+.example-usage {
+  background: var(--color-cream);
+  border-left: 3px solid var(--color-gold);
+  padding: 16px 20px;
+  margin: 20px 0;
+  font-style: italic;
+  color: var(--color-ink-light);
+}
+.related-terms {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-top: 24px;
+}
+.related-terms .chip {
+  display: inline-block;
+  padding: 5px 14px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1.5px solid var(--color-border);
+  border-radius: 100px;
+  color: var(--color-ink-light);
+  transition: all 0.15s;
+}
+.related-terms .chip:hover { border-color: var(--color-rust); color: var(--color-rust); }
+
+/* ============================================================
+   TOOLTIP DEMO
+   ============================================================ */
+.tooltip-demo-content {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 24px 64px;
+}
+.tooltip-demo-content h1 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+.tooltip-demo-content .demo-text {
+  font-size: 17px;
+  line-height: 1.85;
+  margin-bottom: 28px;
+}
+.tooltip-demo-content .demo-text p { margin-bottom: 16px; }
+.glossary-term-trigger {
+  border-bottom: 1.5px dotted var(--color-rust);
+  color: var(--color-ink);
+  cursor: help;
+  padding-bottom: 1px;
+}
+.glossary-term-trigger:hover {
+  border-bottom-color: var(--color-rust-light);
+  color: var(--color-rust);
+}
+
+/* Tooltip (one shown open for demo) */
+.tooltip-card {
+  position: absolute;
+  background: var(--color-cream);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  box-shadow: var(--shadow-lg);
+  max-width: 300px;
+  font-size: 14px;
+  line-height: 1.55;
+  z-index: 500;
+}
+.tooltip-card::after {
+  content: '';
+  position: absolute;
+  bottom: -7px; left: 40px;
+  width: 12px; height: 12px;
+  background: var(--color-cream);
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  transform: rotate(45deg);
+}
+.tooltip-card .tooltip-term {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: var(--color-ink);
+}
+.tooltip-card .tooltip-def {
+  color: var(--color-ink-light);
+  margin-bottom: 8px;
+}
+.tooltip-card .tooltip-link {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.annotation-callout {
+  background: var(--color-gold-pale);
+  border: 1px dashed var(--color-gold);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-ink-light);
+  margin-top: 32px;
+}
+.annotation-callout strong { color: var(--color-gold); }
+
+/* ============================================================
+   ADMIN LAYOUT
+   ============================================================ */
+.admin-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  background: var(--color-ink);
+  color: #fff;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 44px; /* below mockup tabs */
+  height: calc(100vh - 44px);
+}
+.admin-sidebar .sidebar-logo {
+  padding: 0 20px 24px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  margin-bottom: 12px;
+}
+.admin-sidebar nav { flex: 1; }
+.admin-sidebar nav a {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 20px;
+  color: rgba(255,255,255,0.55);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+.admin-sidebar nav a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+.admin-sidebar nav a.active { color: #fff; background: rgba(255,255,255,0.08); border-right: 3px solid var(--color-rust); }
+.admin-sidebar nav a .badge {
+  margin-left: auto;
+  background: rgba(255,255,255,0.12);
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+}
+.admin-sidebar .sidebar-user {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-ui); font-size: 13px;
+}
+.sidebar-user .avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--color-rust);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 600; font-size: 13px; color: #fff;
+}
+.sidebar-user .user-info { flex: 1; }
+.sidebar-user .user-name { color: #fff; font-weight: 500; }
+.sidebar-user .signout { color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; }
+.sidebar-user .signout:hover { color: rgba(255,255,255,0.7); }
+
+/* Admin Main */
+.admin-main {
+  background: var(--color-cream);
+  padding: 28px 32px;
+  min-height: calc(100vh - 44px);
+}
+.admin-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 28px;
+}
+.admin-topbar h1 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+}
+
+/* Stats cards */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.stat-card {
+  background: var(--color-warm-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+.stat-card .stat-label {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-ink-muted);
+  margin-bottom: 6px;
+}
+.stat-card .stat-value {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+}
+.stat-card.highlight {
+  border-color: var(--color-gold);
+  background: var(--color-gold-pale);
+}
+
+/* Admin buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 18px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--color-rust); color: #fff; }
+.btn-primary:hover { background: var(--color-rust-light); }
+.btn-secondary { background: var(--color-warm-white); border-color: var(--color-border); color: var(--color-ink-light); }
+.btn-secondary:hover { border-color: var(--color-border-dark); }
+.btn-sage { background: var(--color-sage); color: #fff; }
+.btn-sage:hover { background: #4d6b50; }
+.btn-gold { background: var(--color-gold); color: #fff; }
+.btn-gold:hover { background: #b08726; }
+.btn-danger { background: transparent; border-color: var(--color-status-rejected); color: var(--color-status-rejected); }
+.btn-danger:hover { background: var(--color-rust-pale); }
+.btn-sm { padding: 5px 12px; font-size: 12px; }
+.btn-icon {
+  width: 32px; height: 32px; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm); cursor: pointer;
+  color: var(--color-ink-muted); transition: all 0.15s;
+}
+.btn-icon:hover { border-color: var(--color-border-dark); color: var(--color-ink-light); }
+
+/* Admin sections */
+.admin-section {
+  background: var(--color-warm-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.admin-section h2 {
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--color-ink);
+}
+
+/* Admin table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-ui);
+  font-size: 14px;
+}
+.admin-table th {
+  text-align: left;
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-muted);
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--color-border);
+}
+.admin-table td {
+  padding: 12px 12px;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-ink-light);
+  vertical-align: middle;
+}
+.admin-table tr:hover td { background: rgba(250,247,242,0.5); }
+.admin-table .question-cell {
+  max-width: 280px;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.status-draft { background: #f0f0f0; color: var(--color-status-draft); }
+.status-pending { background: var(--color-gold-pale); color: var(--color-status-pending); }
+.status-published { background: var(--color-sage-light); color: var(--color-status-published); }
+.status-rejected { background: var(--color-rust-pale); color: var(--color-status-rejected); }
+
+/* Filters row */
+.filters-row {
+  display: flex; gap: 12px; flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.filter-input {
+  padding: 8px 14px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-warm-white);
+  color: var(--color-ink);
+  min-width: 180px;
+}
+.filter-input:focus { outline: none; border-color: var(--color-rust); }
+.filter-select {
+  padding: 8px 32px 8px 14px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-warm-white);
+  color: var(--color-ink);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%238A8A8A' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+/* ============================================================
+   ADMIN FORM LAYOUT (Edit pages)
+   ============================================================ */
+.edit-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+.form-group { margin-bottom: 20px; }
+.form-label {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink-light);
+  margin-bottom: 6px;
+}
+.form-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-warm-white);
+  color: var(--color-ink);
+  transition: border-color 0.15s;
+}
+.form-input:focus { outline: none; border-color: var(--color-rust); }
+.form-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-warm-white);
+  color: var(--color-ink);
+  resize: vertical;
+}
+.form-textarea:focus { outline: none; border-color: var(--color-rust); }
+.form-slug {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--color-ink-muted);
+}
+.char-count {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  color: var(--color-ink-muted);
+  text-align: right;
+  margin-top: 4px;
+}
+
+/* Tiptap-style editor mockup */
+.editor-mockup {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.editor-toolbar {
+  display: flex; gap: 2px; flex-wrap: wrap;
+  padding: 6px 8px;
+  background: #f8f6f2;
+  border-bottom: 1px solid var(--color-border);
+}
+.editor-toolbar button {
+  width: 30px; height: 30px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none;
+  border-radius: 3px; cursor: pointer;
+  font-family: var(--font-ui); font-size: 13px; font-weight: 600;
+  color: var(--color-ink-light);
+  transition: background 0.15s;
+}
+.editor-toolbar button:hover { background: rgba(0,0,0,0.06); }
+.editor-toolbar .sep {
+  width: 1px; margin: 4px 4px;
+  background: var(--color-border);
+}
+.editor-content {
+  min-height: 240px;
+  padding: 16px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--color-ink);
+  background: var(--color-warm-white);
+}
+
+/* Tags multi-select */
+.tags-input {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  padding: 6px 10px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-warm-white);
+  min-height: 40px;
+}
+.tag-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  background: var(--color-sage-light);
+  color: var(--color-sage);
+  border-radius: 100px;
+  font-family: var(--font-ui); font-size: 12px; font-weight: 500;
+}
+.tag-chip .remove {
+  cursor: pointer; font-size: 14px; line-height: 1;
+  color: var(--color-sage); opacity: 0.6;
+}
+.tag-chip .remove:hover { opacity: 1; }
+
+/* Toggle */
+.toggle-row {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-ui); font-size: 14px;
+}
+.toggle {
+  position: relative;
+  width: 44px; height: 24px;
+  background: var(--color-border-dark);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle.on { background: var(--color-sage); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+.toggle.on::after { transform: translateX(20px); }
+
+/* Status card in sidebar */
+.status-card {
+  background: var(--color-warm-white);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.status-card .current-status {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--color-ink-muted);
+  margin-bottom: 8px;
+}
+.status-card .workflow-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+
+/* Metadata list */
+.meta-list {
+  font-family: var(--font-ui);
+  font-size: 13px;
+}
+.meta-list dt {
+  color: var(--color-ink-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2px;
+}
+.meta-list dd {
+  color: var(--color-ink-light);
+  margin-bottom: 12px;
+}
+
+/* Action row at bottom of edit pages */
+.form-actions {
+  display: flex; gap: 12px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+  margin-top: 12px;
+}
+
+/* Pending review table */
+.review-item {
+  display: flex; align-items: center; gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-ui);
+  font-size: 14px;
+}
+.review-item:last-child { border-bottom: none; }
+.review-item .review-question { flex: 1; font-weight: 500; color: var(--color-ink); }
+.review-item .review-author { color: var(--color-ink-muted); font-size: 13px; }
+.review-item .review-date { color: var(--color-ink-muted); font-size: 12px; }
+
+/* SVG Icons (inline) */
+.icon {
+  display: inline-block;
+  width: 16px; height: 16px;
+  vertical-align: middle;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .faq-detail-layout { grid-template-columns: 1fr; gap: 24px; }
+  .admin-layout { grid-template-columns: 1fr; }
+  .admin-sidebar { display: none; }
+  .edit-layout { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .hero h1 { font-size: 32px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     MOCKUP TAB NAVIGATION
+     ============================================================ -->
+<div class="mockup-tabs" role="tablist">
+  <button class="active" data-tab="faq-index" role="tab">FAQ Index</button>
+  <button data-tab="faq-detail" role="tab">FAQ Detail</button>
+  <button data-tab="glossary-index" role="tab">Glossary Index</button>
+  <button data-tab="glossary-detail" role="tab">Glossary Detail</button>
+  <button data-tab="tooltip-demo" role="tab">Tooltip Demo</button>
+  <button data-tab="admin-dashboard" role="tab">Admin Dashboard</button>
+  <button data-tab="admin-faq-list" role="tab">Admin FAQ List</button>
+  <button data-tab="admin-faq-edit" role="tab">Admin FAQ Edit</button>
+  <button data-tab="admin-glossary-edit" role="tab">Admin Glossary Edit</button>
+</div>
+
+
+<!-- ============================================================
+     PAGE 1: FAQ INDEX
+     ============================================================ -->
+<div id="faq-index" class="page-view active">
+  <div class="public-container">
+    <div class="breadcrumb">
+      <a href="#">Home</a> <span>›</span> FAQ
+    </div>
+
+    <div class="hero">
+      <h1>Frequently Asked Questions</h1>
+      <div class="search-bar">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search questions…">
+      </div>
+    </div>
+
+    <div class="category-pills">
+      <span class="pill active">All</span>
+      <span class="pill">Getting Started</span>
+      <span class="pill">Tickets &amp; Pricing</span>
+      <span class="pill">Events &amp; Schedule</span>
+      <span class="pill">Accessibility</span>
+      <span class="pill">Parking &amp; Directions</span>
+    </div>
+
+    <div class="faq-list">
+      <!-- Featured Card -->
+      <div class="faq-card featured">
+        <div class="question"><a href="#">What are the park hours for the 2025 season?</a></div>
+        <div class="preview">The fairgrounds are open daily from 8:00 AM to 11:00 PM during the main fair dates (August 21 – September 1). Individual exhibit halls and…</div>
+        <div class="meta">
+          <span class="pill-sm pill-gold">Featured</span>
+          <span class="pill-sm pill-category">Events &amp; Schedule</span>
+          <span>Updated Dec 14, 2024</span>
+        </div>
+      </div>
+
+      <!-- Regular Cards -->
+      <div class="faq-card">
+        <div class="question"><a href="#">How much do tickets cost?</a></div>
+        <div class="preview">General admission is $18 for adults (ages 13–64), $14 for seniors (65+), and free for children 12 and under. Multi-day passes and group…</div>
+        <div class="meta">
+          <span class="pill-sm pill-category">Tickets &amp; Pricing</span>
+          <span>Updated Nov 30, 2024</span>
+        </div>
+      </div>
+
+      <div class="faq-card">
+        <div class="question"><a href="#">Is the fair accessible for visitors with disabilities?</a></div>
+        <div class="preview">Yes. The fairgrounds are fully ADA-compliant with paved pathways, wheelchair-accessible restrooms, and designated viewing areas at…</div>
+        <div class="meta">
+          <span class="pill-sm pill-category">Accessibility</span>
+          <span>Updated Dec 2, 2024</span>
+        </div>
+      </div>
+
+      <div class="faq-card">
+        <div class="question"><a href="#">Where can I park, and how much does it cost?</a></div>
+        <div class="preview">On-site parking is available in Lots A through F for $15 per vehicle. Premium parking (Lot A, closest to main gate) is $25. Free shuttle…</div>
+        <div class="meta">
+          <span class="pill-sm pill-category">Parking &amp; Directions</span>
+          <span>Updated Nov 28, 2024</span>
+        </div>
+      </div>
+
+      <div class="faq-card">
+        <div class="question"><a href="#">Can I bring my own food and drinks?</a></div>
+        <div class="preview">Outside food and non-alcoholic beverages are permitted. Coolers must be soft-sided and no larger than 18" × 14". Glass containers and…</div>
+        <div class="meta">
+          <span class="pill-sm pill-category">Getting Started</span>
+          <span>Updated Nov 25, 2024</span>
+        </div>
+      </div>
+
+      <div class="faq-card">
+        <div class="question"><a href="#">How do I enter my project in a competitive exhibit?</a></div>
+        <div class="preview">Competitive exhibits span dozens of departments from fine arts to livestock. Entry registration opens online June 1 and closes July 15…</div>
+        <div class="meta">
+          <span class="pill-sm pill-category">Getting Started</span>
+          <span>Updated Dec 5, 2024</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <button disabled>‹</button>
+      <div class="page-num active">1</div>
+      <div class="page-num">2</div>
+      <div class="page-num">3</div>
+      <div class="page-num">4</div>
+      <div class="page-num">…</div>
+      <div class="page-num">12</div>
+      <button>›</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 2: FAQ DETAIL
+     ============================================================ -->
+<div id="faq-detail" class="page-view">
+  <div class="public-container">
+    <div class="breadcrumb">
+      <a href="#">Home</a> <span>›</span> <a href="#">FAQ</a> <span>›</span> <a href="#">Tickets &amp; Pricing</a> <span>›</span> What are the park hours?
+    </div>
+
+    <div class="faq-detail-layout">
+      <div class="faq-detail-body">
+        <h1>What are the park hours for the 2025 season?</h1>
+        <div class="tag-row">
+          <span class="pill-sm pill-category">Events &amp; Schedule</span>
+          <span class="pill-sm pill-tag">Hours</span>
+          <span class="pill-sm pill-tag">General Info</span>
+        </div>
+
+        <div class="answer">
+          <p>The fairgrounds are open daily from <strong>8:00 AM to 11:00 PM</strong> during the main fair dates (<strong>August 21 – September 1, 2025</strong>). Individual exhibit halls, barns, and vendor areas may keep slightly different hours.</p>
+
+          <p>Here's a general breakdown of operating hours by area:</p>
+
+          <ul>
+            <li><strong>Main gates:</strong> 8:00 AM – 10:00 PM (last entry at 9:30 PM)</li>
+            <li><strong>Exhibit halls &amp; commercial buildings:</strong> 9:00 AM – 9:00 PM</li>
+            <li><strong>Livestock barns:</strong> 8:00 AM – 8:00 PM</li>
+            <li><strong>Midway rides &amp; games:</strong> 10:00 AM – 11:00 PM</li>
+            <li><strong>Grandstand events:</strong> Vary by show — see the <a href="#">full schedule</a></li>
+          </ul>
+
+          <p>On <strong>opening day</strong> (August 21), gates open at 7:00 AM for the traditional ribbon-cutting ceremony. On <strong>closing night</strong> (September 1), the midway stays open until midnight for the farewell fireworks show.</p>
+
+          <p>For the most up-to-date information, check the <a href="#">daily schedule page</a> or download the official fair app.</p>
+        </div>
+
+        <a class="back-link" href="#">← Back to all FAQs</a>
+      </div>
+
+      <div class="faq-sidebar">
+        <div class="sidebar-section">
+          <h3>Related Questions</h3>
+          <ul>
+            <li><a href="#">How much do tickets cost?</a></li>
+            <li><a href="#">What's the entertainment schedule?</a></li>
+            <li><a href="#">Are re-entry wristbands available?</a></li>
+            <li><a href="#">When does the midway close?</a></li>
+          </ul>
+        </div>
+
+        <div class="sidebar-section">
+          <h3>Was this helpful?</h3>
+          <div class="helpful-row">
+            <button class="helpful-btn">👍 Yes</button>
+            <button class="helpful-btn">👎 No</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 3: GLOSSARY INDEX
+     ============================================================ -->
+<div id="glossary-index" class="page-view">
+  <div class="public-container">
+    <div class="breadcrumb">
+      <a href="#">Home</a> <span>›</span> Glossary
+    </div>
+
+    <div class="hero">
+      <h1>Glossary</h1>
+      <div class="search-bar">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search glossary terms…">
+      </div>
+    </div>
+
+    <div class="az-bar">
+      <a href="#letter-4" class="active">4</a>
+      <a href="#letter-A">A</a>
+      <a href="#letter-B">B</a>
+      <a href="#letter-C">C</a>
+      <a class="dimmed">D</a>
+      <a class="dimmed">E</a>
+      <a href="#letter-F">F</a>
+      <a href="#letter-G">G</a>
+      <a href="#letter-H">H</a>
+      <a class="dimmed">I</a>
+      <a class="dimmed">J</a>
+      <a class="dimmed">K</a>
+      <a href="#letter-L">L</a>
+      <a href="#letter-M">M</a>
+      <a class="dimmed">N</a>
+      <a class="dimmed">O</a>
+      <a href="#letter-P">P</a>
+      <a class="dimmed">Q</a>
+      <a class="dimmed">R</a>
+      <a href="#letter-S">S</a>
+      <a class="dimmed">T</a>
+      <a class="dimmed">U</a>
+      <a class="dimmed">V</a>
+      <a class="dimmed">W</a>
+      <a class="dimmed">X</a>
+      <a class="dimmed">Y</a>
+      <a class="dimmed">Z</a>
+    </div>
+
+    <div class="glossary-group" id="letter-4">
+      <h2>4</h2>
+      <dl>
+        <dt>4-H <span class="abbr">(Head, Heart, Hands, Health)</span></dt>
+        <dd>A national youth development organization administered by USDA through land-grant universities. Members aged 5–19 complete hands-on projects in science, agriculture, citizenship, and healthy living. <a href="#" class="read-more">Read more →</a></dd>
+      </dl>
+    </div>
+
+    <div class="glossary-group" id="letter-A">
+      <h2>A</h2>
+      <dl>
+        <dt>Agricultural Extension</dt>
+        <dd>A cooperative educational system linking USDA, land-grant universities, and county governments to deliver research-based knowledge to farmers, ranchers, and communities.</dd>
+
+        <dt>Apiary <span class="abbr">(also: Bee Yard)</span></dt>
+        <dd>A managed collection of beehives. County and state fairs commonly feature apiary exhibits where beekeepers display observation hives and extracted honey products.</dd>
+      </dl>
+    </div>
+
+    <div class="glossary-group" id="letter-B">
+      <h2>B</h2>
+      <dl>
+        <dt>Best of Show <span class="abbr">(BOS)</span></dt>
+        <dd>The highest award given to the single best entry across an entire competitive department, selected from all first-place ("blue ribbon") winners.</dd>
+
+        <dt>Blue Ribbon</dt>
+        <dd>An award signifying first place in a competitive exhibit class. Originates from the traditional blue satin ribbon attached to the entry's tag. <a href="#" class="read-more">Read more →</a></dd>
+      </dl>
+    </div>
+
+    <div class="glossary-group" id="letter-C">
+      <h2>C</h2>
+      <dl>
+        <dt>Cloverbud</dt>
+        <dd>A 4-H program for children ages 5–7 (varies by state). Cloverbuds participate in non-competitive, exploratory activities designed to build curiosity and basic life skills.</dd>
+
+        <dt>Competitive Exhibit</dt>
+        <dd>An entry submitted to be judged against published standards (a "Danish system") or against other entries in the same class. Categories include fine arts, textiles, baked goods, livestock, crops, and more. <a href="#" class="read-more">Read more →</a></dd>
+      </dl>
+    </div>
+
+    <div class="glossary-group" id="letter-F">
+      <h2>F</h2>
+      <dl>
+        <dt>FFA <span class="abbr">(Future Farmers of America)</span></dt>
+        <dd>A national youth organization for students enrolled in agricultural education programs. FFA members often compete in Career Development Events (CDEs) at state fairs. <a href="#" class="read-more">Read more →</a></dd>
+      </dl>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 4: GLOSSARY TERM DETAIL
+     ============================================================ -->
+<div id="glossary-detail" class="page-view">
+  <div class="public-container">
+    <div class="breadcrumb">
+      <a href="#">Home</a> <span>›</span> <a href="#">Glossary</a> <span>›</span> 4-H
+    </div>
+
+    <div class="term-detail-layout">
+      <div>
+        <h1>4-H</h1>
+        <div class="term-expansion">Head, Heart, Hands, Health</div>
+      </div>
+
+      <div class="short-def-box">
+        A national youth development organization administered by USDA through land-grant universities. Members aged 5–19 complete hands-on projects in science, agriculture, citizenship, and healthy living.
+      </div>
+
+      <div class="term-body">
+        <p>4-H is one of the largest youth development programs in the United States, reaching nearly six million young people annually. The four H's represent the organization's pledge: "I pledge my <strong>Head</strong> to clearer thinking, my <strong>Heart</strong> to greater loyalty, my <strong>Hands</strong> to larger service, and my <strong>Health</strong> to better living."</p>
+
+        <p>At state and county fairs, 4-H members exhibit projects they have worked on throughout the year. These projects span a remarkable range — from raising livestock and growing crops to robotics, photography, public speaking, and fashion design. Each project is evaluated by judges using published scoring rubrics, and participants receive feedback along with ribbon awards.</p>
+
+        <p>The organization is structured at three levels: national (administered by USDA's National Institute of Food and Agriculture), state (managed by each land-grant university's Cooperative Extension Service), and local (run by volunteer leaders in community clubs).</p>
+      </div>
+
+      <div class="example-usage">
+        "My daughter has been in <strong>4-H</strong> since she was a Cloverbud, and this year she's showing her market lamb at the State Fair for the first time."
+      </div>
+
+      <div>
+        <div class="form-label" style="margin-top:24px; margin-bottom:10px;">Related Terms</div>
+        <div class="related-terms">
+          <a href="#" class="chip">Cloverbud</a>
+          <a href="#" class="chip">FFA</a>
+          <a href="#" class="chip">Competitive Exhibit</a>
+          <a href="#" class="chip">Agricultural Extension</a>
+          <a href="#" class="chip">Blue Ribbon</a>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="form-label" style="margin-bottom:10px;">See Also</div>
+        <ul style="list-style:none; font-family:var(--font-ui); font-size:14px;">
+          <li style="margin-bottom:6px;"><a href="#">National 4-H Council (external)</a></li>
+          <li style="margin-bottom:6px;"><a href="#">How to enter a 4-H exhibit</a> — FAQ</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 5: TOOLTIP DEMO
+     ============================================================ -->
+<div id="tooltip-demo" class="page-view">
+  <div class="tooltip-demo-content">
+    <h1>Glossary Tooltip Widget Demo</h1>
+
+    <div class="demo-text" style="position:relative;">
+      <p>Every year, thousands of young people bring their best work to the state fair. Whether you're a <span class="glossary-term-trigger" id="trigger-4h">4-H</span> member showing a market lamb, an <span class="glossary-term-trigger">FFA</span> student competing in livestock judging, or a <span class="glossary-term-trigger">Cloverbud</span> proudly displaying a first garden project, the fair is a celebration of hands-on learning.</p>
+
+      <!-- Tooltip shown open (positioned relative to 4-H trigger) -->
+      <div class="tooltip-card" style="top: -115px; left: 130px;">
+        <div class="tooltip-term">4-H</div>
+        <div class="tooltip-def">A national youth development organization administered by USDA through land-grant universities. Members aged 5–19 complete hands-on projects.</div>
+        <a href="#" class="tooltip-link">Read more →</a>
+      </div>
+
+      <p>Exhibits are evaluated by trained judges using a <span class="glossary-term-trigger">Danish system</span> where each entry is scored against a published standard — not against the other entries. A project that meets the standard earns a <span class="glossary-term-trigger">Blue Ribbon</span> regardless of how many other entries also excel. The single best entry in a department receives <span class="glossary-term-trigger">Best of Show</span>.</p>
+
+      <p>Behind the scenes, the county <span class="glossary-term-trigger">Agricultural Extension</span> office coordinates volunteers, secures judges, and ensures every exhibit space — from the <span class="glossary-term-trigger">apiary</span> display in the agriculture building to the textile arts hall — is ready for opening day.</p>
+    </div>
+
+    <div class="annotation-callout">
+      <strong>How it works:</strong> The glossary tooltip widget scans page content for known glossary terms and adds an interactive dotted underline. On hover (or tap on mobile), a tooltip card appears with the short definition and a link to the full glossary entry. Terms are matched longest-first to avoid partial matches (e.g., "Best of Show" is matched before "Best").
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 6: ADMIN DASHBOARD
+     ============================================================ -->
+<div id="admin-dashboard" class="page-view">
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">Fair CMS</div>
+      <nav>
+        <a href="#" class="active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          FAQs
+          <span class="badge">247</span>
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          Glossary
+          <span class="badge">86</span>
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Categories
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Tags
+        </a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="avatar">JD</div>
+        <div class="user-info">
+          <div class="user-name">Jane Doe</div>
+          <div class="signout">Sign out</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <h1>Welcome back, Jane</h1>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total FAQs</div>
+          <div class="stat-value">247</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Published</div>
+          <div class="stat-value" style="color:var(--color-sage);">218</div>
+        </div>
+        <div class="stat-card highlight">
+          <div class="stat-label">Pending Review</div>
+          <div class="stat-value" style="color:var(--color-gold);">12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Drafts</div>
+          <div class="stat-value">17</div>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Pending Review</h2>
+        <div class="review-item">
+          <div class="review-question">Can I bring my service animal to the fairgrounds?</div>
+          <div class="review-author">by Mark R.</div>
+          <div class="review-date">Feb 8, 2025</div>
+          <button class="btn btn-gold btn-sm">Review</button>
+        </div>
+        <div class="review-item">
+          <div class="review-question">What are the livestock check-in deadlines?</div>
+          <div class="review-author">by Sarah L.</div>
+          <div class="review-date">Feb 7, 2025</div>
+          <button class="btn btn-gold btn-sm">Review</button>
+        </div>
+        <div class="review-item">
+          <div class="review-question">How do I volunteer as a judge for open class exhibits?</div>
+          <div class="review-author">by Tom B.</div>
+          <div class="review-date">Feb 6, 2025</div>
+          <button class="btn btn-gold btn-sm">Review</button>
+        </div>
+        <div class="review-item">
+          <div class="review-question">Are strollers and wagons allowed on the grounds?</div>
+          <div class="review-author">by Lisa M.</div>
+          <div class="review-date">Feb 5, 2025</div>
+          <button class="btn btn-gold btn-sm">Review</button>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <h2>Recently Updated</h2>
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Updated</th>
+              <th>By</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="question-cell">What are the park hours for the 2025 season?</td>
+              <td><span class="pill-sm pill-category">FAQ</span></td>
+              <td><span class="status-badge status-published">Published</span></td>
+              <td>Feb 9, 2025</td>
+              <td>Jane D.</td>
+            </tr>
+            <tr>
+              <td class="question-cell">Blue Ribbon</td>
+              <td><span class="pill-sm pill-tag">Glossary</span></td>
+              <td><span class="status-badge status-published">Published</span></td>
+              <td>Feb 8, 2025</td>
+              <td>Mark R.</td>
+            </tr>
+            <tr>
+              <td class="question-cell">How much do tickets cost?</td>
+              <td><span class="pill-sm pill-category">FAQ</span></td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td>Feb 8, 2025</td>
+              <td>Sarah L.</td>
+            </tr>
+            <tr>
+              <td class="question-cell">4-H</td>
+              <td><span class="pill-sm pill-tag">Glossary</span></td>
+              <td><span class="status-badge status-draft">Draft</span></td>
+              <td>Feb 7, 2025</td>
+              <td>Tom B.</td>
+            </tr>
+            <tr>
+              <td class="question-cell">Is the fair accessible for visitors with disabilities?</td>
+              <td><span class="pill-sm pill-category">FAQ</span></td>
+              <td><span class="status-badge status-published">Published</span></td>
+              <td>Feb 6, 2025</td>
+              <td>Jane D.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 7: ADMIN FAQ LIST
+     ============================================================ -->
+<div id="admin-faq-list" class="page-view">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">Fair CMS</div>
+      <nav>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="#" class="active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          FAQs
+          <span class="badge">247</span>
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          Glossary
+          <span class="badge">86</span>
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Categories
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Tags
+        </a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="avatar">JD</div>
+        <div class="user-info">
+          <div class="user-name">Jane Doe</div>
+          <div class="signout">Sign out</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <h1>FAQs</h1>
+        <button class="btn btn-primary">+ New FAQ</button>
+      </div>
+
+      <div class="filters-row">
+        <input type="text" class="filter-input" placeholder="Search FAQs…" style="flex:1;">
+        <select class="filter-select">
+          <option>All Statuses</option>
+          <option>Draft</option>
+          <option>Pending Review</option>
+          <option>Published</option>
+          <option>Rejected</option>
+        </select>
+        <select class="filter-select">
+          <option>All Categories</option>
+          <option>Getting Started</option>
+          <option>Tickets &amp; Pricing</option>
+          <option>Events &amp; Schedule</option>
+          <option>Accessibility</option>
+          <option>Parking &amp; Directions</option>
+        </select>
+      </div>
+
+      <div class="admin-section" style="padding:0; overflow:hidden;">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th style="width:35%;">Question</th>
+              <th>Category</th>
+              <th>Status</th>
+              <th>Author</th>
+              <th>Updated</th>
+              <th style="width:100px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="question-cell">What are the park hours for the 2025 season?</td>
+              <td><span class="pill-sm pill-category">Events &amp; Schedule</span></td>
+              <td><span class="status-badge status-published">Published</span></td>
+              <td>Jane D.</td>
+              <td>Feb 9</td>
+              <td>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-icon" title="Edit">✎</button>
+                  <button class="btn-icon" title="View">👁</button>
+                  <button class="btn-icon" title="Delete" style="color:var(--color-status-rejected);">✕</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="question-cell">How much do tickets cost?</td>
+              <td><span class="pill-sm pill-category">Tickets &amp; Pricing</span></td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td>Sarah L.</td>
+              <td>Feb 8</td>
+              <td>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-icon" title="Edit">✎</button>
+                  <button class="btn-icon" title="View">👁</button>
+                  <button class="btn-icon" title="Delete" style="color:var(--color-status-rejected);">✕</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="question-cell">Can I bring my service animal to the fairgrounds?</td>
+              <td><span class="pill-sm pill-category">Accessibility</span></td>
+              <td><span class="status-badge status-pending">Pending</span></td>
+              <td>Mark R.</td>
+              <td>Feb 8</td>
+              <td>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-icon" title="Edit">✎</button>
+                  <button class="btn-icon" title="View">👁</button>
+                  <button class="btn-icon" title="Delete" style="color:var(--color-status-rejected);">✕</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="question-cell">Where can I park, and how much does it cost?</td>
+              <td><span class="pill-sm pill-category">Parking &amp; Directions</span></td>
+              <td><span class="status-badge status-published">Published</span></td>
+              <td>Tom B.</td>
+              <td>Feb 7</td>
+              <td>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-icon" title="Edit">✎</button>
+                  <button class="btn-icon" title="View">👁</button>
+                  <button class="btn-icon" title="Delete" style="color:var(--color-status-rejected);">✕</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="question-cell">How do I enter my project in a competitive exhibit?</td>
+              <td><span class="pill-sm pill-category">Getting Started</span></td>
+              <td><span class="status-badge status-draft">Draft</span></td>
+              <td>Lisa M.</td>
+              <td>Feb 6</td>
+              <td>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-icon" title="Edit">✎</button>
+                  <button class="btn-icon" title="View">👁</button>
+                  <button class="btn-icon" title="Delete" style="color:var(--color-status-rejected);">✕</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="question-cell">Can I bring my own food and drinks?</td>
+              <td><span class="pill-sm pill-category">Getting Started</span></td>
+              <td><span class="status-badge status-published">Published</span></td>
+              <td>Jane D.</td>
+              <td>Feb 5</td>
+              <td>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-icon" title="Edit">✎</button>
+                  <button class="btn-icon" title="View">👁</button>
+                  <button class="btn-icon" title="Delete" style="color:var(--color-status-rejected);">✕</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td class="question-cell">Is the fair accessible for visitors with disabilities?</td>
+              <td><span class="pill-sm pill-category">Accessibility</span></td>
+              <td><span class="status-badge status-rejected">Rejected</span></td>
+              <td>Mark R.</td>
+              <td>Feb 4</td>
+              <td>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn-icon" title="Edit">✎</button>
+                  <button class="btn-icon" title="View">👁</button>
+                  <button class="btn-icon" title="Delete" style="color:var(--color-status-rejected);">✕</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination" style="justify-content:flex-end; gap:8px;">
+        <span style="font-family:var(--font-ui); font-size:13px; color:var(--color-ink-muted); margin-right:8px;">Showing 1–7 of 247</span>
+        <button disabled>‹</button>
+        <div class="page-num active">1</div>
+        <div class="page-num">2</div>
+        <div class="page-num">3</div>
+        <div class="page-num">…</div>
+        <div class="page-num">36</div>
+        <button>›</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 8: ADMIN FAQ EDIT
+     ============================================================ -->
+<div id="admin-faq-edit" class="page-view">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">Fair CMS</div>
+      <nav>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="#" class="active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          FAQs
+          <span class="badge">247</span>
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          Glossary
+          <span class="badge">86</span>
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Categories
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Tags
+        </a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="avatar">JD</div>
+        <div class="user-info">
+          <div class="user-name">Jane Doe</div>
+          <div class="signout">Sign out</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <div class="breadcrumb" style="padding:0; margin-bottom:4px;">
+            <a href="#">FAQs</a> <span>›</span> Edit
+          </div>
+          <h1>Edit FAQ</h1>
+        </div>
+        <span class="status-badge status-pending" style="font-size:13px; padding:5px 14px;">Pending Review</span>
+      </div>
+
+      <div class="edit-layout">
+        <!-- Left column: content -->
+        <div>
+          <div class="admin-section">
+            <div class="form-group">
+              <label class="form-label">Question</label>
+              <input type="text" class="form-input" value="What are the park hours for the 2025 season?" style="font-family:var(--font-display); font-size:18px; font-weight:600;">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Answer</label>
+              <div class="editor-mockup">
+                <div class="editor-toolbar">
+                  <button title="Bold"><strong>B</strong></button>
+                  <button title="Italic"><em>I</em></button>
+                  <div class="sep"></div>
+                  <button title="Heading 2" style="font-size:11px;">H2</button>
+                  <button title="Heading 3" style="font-size:11px;">H3</button>
+                  <div class="sep"></div>
+                  <button title="Link">🔗</button>
+                  <button title="Image">🖼</button>
+                  <div class="sep"></div>
+                  <button title="Bullet List">☰</button>
+                  <button title="Ordered List">≡</button>
+                  <div class="sep"></div>
+                  <button title="Code">&lt;/&gt;</button>
+                  <button title="Table">⊞</button>
+                  <div class="sep"></div>
+                  <button title="Blockquote">❝</button>
+                </div>
+                <div class="editor-content">
+                  <p>The fairgrounds are open daily from <strong>8:00 AM to 11:00 PM</strong> during the main fair dates (<strong>August 21 – September 1, 2025</strong>). Individual exhibit halls, barns, and vendor areas may keep slightly different hours.</p>
+                  <p style="margin-top:12px;">Here's a general breakdown of operating hours by area:</p>
+                  <ul style="margin:8px 0 8px 20px;">
+                    <li><strong>Main gates:</strong> 8:00 AM – 10:00 PM (last entry at 9:30 PM)</li>
+                    <li><strong>Exhibit halls &amp; commercial buildings:</strong> 9:00 AM – 9:00 PM</li>
+                    <li><strong>Livestock barns:</strong> 8:00 AM – 8:00 PM</li>
+                    <li><strong>Midway rides &amp; games:</strong> 10:00 AM – 11:00 PM</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Search Keywords</label>
+              <input type="text" class="form-input" value="hours, schedule, opening time, closing time, gates, midway" placeholder="Comma-separated keywords for search…">
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn btn-secondary">Save Draft</button>
+            <button class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Right column: sidebar controls -->
+        <div>
+          <div class="status-card">
+            <div class="current-status">Current Status</div>
+            <span class="status-badge status-pending" style="font-size:13px; padding:5px 14px;">Pending Review</span>
+            <div class="workflow-actions">
+              <button class="btn btn-sage" style="width:100%;">✓ Approve</button>
+              <button class="btn btn-danger" style="width:100%;">✕ Reject</button>
+            </div>
+            <div style="font-family:var(--font-ui); font-size:11px; color:var(--color-ink-muted); margin-top:8px; text-align:center;">
+              Submitted by Mark R. · You may approve since you are not the author.
+            </div>
+          </div>
+
+          <div class="status-card">
+            <div class="form-group" style="margin-bottom:16px;">
+              <label class="form-label">Category</label>
+              <select class="filter-select" style="width:100%;">
+                <option selected>Events &amp; Schedule</option>
+                <option>Tickets &amp; Pricing</option>
+                <option>Getting Started</option>
+                <option>Accessibility</option>
+                <option>Parking &amp; Directions</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom:16px;">
+              <label class="form-label">Tags</label>
+              <div class="tags-input">
+                <span class="tag-chip">Hours <span class="remove">×</span></span>
+                <span class="tag-chip">General Info <span class="remove">×</span></span>
+                <span class="tag-chip">Schedule <span class="remove">×</span></span>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:16px;">
+              <label class="form-label">Featured</label>
+              <div class="toggle-row">
+                <div class="toggle on"></div>
+                <span>Show on FAQ homepage</span>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Sort Order</label>
+              <input type="number" class="form-input" value="10" style="width:80px;">
+            </div>
+          </div>
+
+          <div class="status-card">
+            <div class="form-label" style="margin-bottom:12px;">Metadata</div>
+            <dl class="meta-list">
+              <dt>Created by</dt>
+              <dd>Mark Robinson</dd>
+              <dt>Created at</dt>
+              <dd>Jan 15, 2025 at 3:42 PM</dd>
+              <dt>Last updated</dt>
+              <dd>Feb 8, 2025 at 11:20 AM</dd>
+              <dt>Version</dt>
+              <dd>3 <span style="color:var(--color-ink-muted);">(2 published)</span></dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     PAGE 9: ADMIN GLOSSARY EDIT
+     ============================================================ -->
+<div id="admin-glossary-edit" class="page-view">
+  <div class="admin-layout">
+    <aside class="admin-sidebar">
+      <div class="sidebar-logo">Fair CMS</div>
+      <nav>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Dashboard
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          FAQs
+          <span class="badge">247</span>
+        </a>
+        <a href="#" class="active">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+          Glossary
+          <span class="badge">86</span>
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          Categories
+        </a>
+        <a href="#">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          Tags
+        </a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="avatar">JD</div>
+        <div class="user-info">
+          <div class="user-name">Jane Doe</div>
+          <div class="signout">Sign out</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="admin-main">
+      <div class="admin-topbar">
+        <div>
+          <div class="breadcrumb" style="padding:0; margin-bottom:4px;">
+            <a href="#">Glossary</a> <span>›</span> Edit
+          </div>
+          <h1>Edit Glossary Term</h1>
+        </div>
+      </div>
+
+      <div class="admin-section">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="form-group">
+            <label class="form-label">Term</label>
+            <input type="text" class="form-input" value="4-H" style="font-family:var(--font-display); font-size:18px; font-weight:600;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Slug</label>
+            <input type="text" class="form-input form-slug" value="4-h" style="font-family:var(--font-mono);">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Short Definition</label>
+          <textarea class="form-textarea" rows="3">A national youth development organization administered by USDA through land-grant universities. Members aged 5–19 complete hands-on projects in science, agriculture, citizenship, and healthy living.</textarea>
+          <div class="char-count">186 / 250 characters</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Long Definition</label>
+          <div class="editor-mockup">
+            <div class="editor-toolbar">
+              <button title="Bold"><strong>B</strong></button>
+              <button title="Italic"><em>I</em></button>
+              <div class="sep"></div>
+              <button title="Heading 2" style="font-size:11px;">H2</button>
+              <button title="Heading 3" style="font-size:11px;">H3</button>
+              <div class="sep"></div>
+              <button title="Link">🔗</button>
+              <button title="Image">🖼</button>
+              <div class="sep"></div>
+              <button title="Bullet List">☰</button>
+              <button title="Ordered List">≡</button>
+            </div>
+            <div class="editor-content" style="min-height:160px;">
+              <p>4-H is one of the largest youth development programs in the United States, reaching nearly six million young people annually. The four H's represent the organization's pledge: "I pledge my <strong>Head</strong> to clearer thinking, my <strong>Heart</strong> to greater loyalty, my <strong>Hands</strong> to larger service, and my <strong>Health</strong> to better living."</p>
+              <p style="margin-top:12px;">At state and county fairs, 4-H members exhibit projects they have worked on throughout the year. These projects span a remarkable range — from raising livestock and growing crops to robotics, photography, public speaking, and fashion design.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="form-group">
+            <label class="form-label">Abbreviation</label>
+            <input type="text" class="form-input" value="4-H">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Acronym Expansion</label>
+            <input type="text" class="form-input" value="Head, Heart, Hands, Health">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Alternate Names</label>
+          <div class="tags-input">
+            <span class="tag-chip">Four-H <span class="remove">×</span></span>
+            <span class="tag-chip">4H <span class="remove">×</span></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="filter-select" style="width:100%; max-width:300px;">
+            <option selected>Youth Programs</option>
+            <option>Livestock</option>
+            <option>Exhibits &amp; Competitions</option>
+            <option>Agriculture</option>
+            <option>Fair Operations</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Example Usage</label>
+          <textarea class="form-textarea" rows="2" style="font-style:italic;">"My daughter has been in 4-H since she was a Cloverbud, and this year she's showing her market lamb at the State Fair for the first time."</textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Related Terms</label>
+          <div class="tags-input">
+            <span class="tag-chip">Cloverbud <span class="remove">×</span></span>
+            <span class="tag-chip">FFA <span class="remove">×</span></span>
+            <span class="tag-chip">Competitive Exhibit <span class="remove">×</span></span>
+            <span class="tag-chip">Agricultural Extension <span class="remove">×</span></span>
+            <span class="tag-chip">Blue Ribbon <span class="remove">×</span></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <div class="toggle-row">
+            <div class="toggle on"></div>
+            <span>Published</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary">Save</button>
+        <button class="btn btn-secondary">Cancel</button>
+      </div>
+    </main>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     TAB SWITCHING SCRIPT
+     ============================================================ -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var tabs = document.querySelectorAll('.mockup-tabs button');
+  var views = document.querySelectorAll('.page-view');
+
+  tabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var target = this.getAttribute('data-tab');
+
+      tabs.forEach(function(t) { t.classList.remove('active'); });
+      views.forEach(function(v) { v.classList.remove('active'); });
+
+      this.classList.add('active');
+      document.getElementById(target).classList.add('active');
+
+      window.scrollTo(0, 0);
+    });
+  });
+
+  // Category pill toggle (FAQ Index)
+  var pills = document.querySelectorAll('#faq-index .category-pills .pill');
+  pills.forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      pills.forEach(function(p) { p.classList.remove('active'); });
+      this.classList.add('active');
+    });
+  });
+
+  // Toggle switch interaction
+  document.querySelectorAll('.toggle').forEach(function(toggle) {
+    toggle.addEventListener('click', function() {
+      this.classList.toggle('on');
+    });
+  });
+});
+</script>
+
+</body>
+</html>

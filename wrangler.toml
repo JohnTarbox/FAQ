@@ -1,0 +1,28 @@
+name = "faq-glossary"
+main = "src/index.ts"
+compatibility_date = "2025-01-15"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database
+[[d1_databases]]
+binding = "DB"
+database_name = "faq-glossary-db"
+database_id = "placeholder-change-me"
+
+# KV Namespace (cache)
+[[kv_namespaces]]
+binding = "CACHE"
+id = "placeholder-change-me"
+
+# R2 Bucket (images)
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "faq-glossary-images"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "development"
+
+# Dev settings
+[dev]
+port = 8787
