@@ -2,12 +2,16 @@ import { Hono } from 'hono';
 import type { AppEnv } from '../index';
 import { FaqService } from '../services/faq.service';
 import { GlossaryService } from '../services/glossary.service';
+import { HomePage } from './home';
 import { FaqIndexPage } from './faq-index';
 import { FaqDetailPage } from './faq-detail';
 import { GlossaryIndexPage } from './glossary-index';
 import { GlossaryDetailPage } from './glossary-detail';
 
 export const pageRoutes = new Hono<AppEnv>();
+
+// Homepage
+pageRoutes.get('/', (c) => c.html(<HomePage />));
 
 // Public FAQ index page
 pageRoutes.get('/faq', async (c) => {

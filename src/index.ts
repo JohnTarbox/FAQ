@@ -39,9 +39,6 @@ app.route('/api/admin/images', adminImageRoutes);
 // Health check
 app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
-// Root redirect
-app.get('/', (c) => c.redirect('/faq'));
-
 // Public image serving from R2
 app.get('/images/*', async (c) => {
   const key = c.req.path.slice(1); // strip leading slash → "images/..."
