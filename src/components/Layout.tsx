@@ -29,6 +29,9 @@ export const Layout: FC<PropsWithChildren<{ title: string; description?: string;
       <div class="public-container">
         {children}
       </div>
+      <footer class="site-footer">
+        <p>APRS is a registered trademark of TAPR.</p>
+      </footer>
       <script src="/glossary/widget.js" defer />
     </body>
   </html>
@@ -58,6 +61,7 @@ a{color:var(--color-rust);text-decoration:none}a:hover{color:var(--color-rust-li
 .site-nav-links a:hover{color:#fff;background:rgba(255,255,255,.08)}
 .site-nav-links a.active{color:#fff;background:var(--color-rust)}
 .public-container{max-width:960px;margin:0 auto;padding:0 24px}
+.site-footer{text-align:center;padding:32px 24px;font-family:var(--font-ui);font-size:11px;color:var(--color-ink-muted)}
 .breadcrumb{font-family:var(--font-ui);font-size:13px;color:var(--color-ink-muted);padding:16px 0}
 .breadcrumb a{color:var(--color-ink-muted)}.breadcrumb a:hover{color:var(--color-rust)}
 .breadcrumb span{margin:0 6px}

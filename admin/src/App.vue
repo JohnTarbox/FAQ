@@ -18,6 +18,7 @@ import SidebarNav from './components/SidebarNav.vue';
     <SidebarNav />
     <main class="admin-main">
       <router-view />
+      <footer class="site-footer">APRS is a registered trademark of TAPR.</footer>
     </main>
   </div>
 </template>
@@ -69,6 +70,12 @@ import SidebarNav from './components/SidebarNav.vue';
   background: var(--color-cream);
   padding: 28px 32px;
   min-height: calc(100vh - 48px);
+}
+.site-footer {
+  text-align: center;
+  padding: 32px 0;
+  font-size: 11px;
+  color: var(--color-ink-muted);
 }
 @media (max-width: 768px) {
   .admin-layout { grid-template-columns: 1fr; }
