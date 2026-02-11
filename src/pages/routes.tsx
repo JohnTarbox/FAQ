@@ -40,6 +40,13 @@ pageRoutes.get('/faq/:slug', async (c) => {
 
   if (!faq) return c.text('FAQ not found', 404);
 
+  // Fetch related FAQs (same category, or just other published FAQs)
+  const allPublished = await faqSvc.listPublished({ limit: 5 });
+  const relatedFaqs = allPublished.items
+    .filter((f: any) => f.slug !== slug)
+    .slice(0, 4)
+    .map((f: any) => ({ question: f.question, slug: f.slug }));
+
   return c.html(
     <FaqDetailPage
       question={faq.question}
@@ -47,6 +54,7 @@ pageRoutes.get('/faq/:slug', async (c) => {
       slug={slug}
       category={faq.category}
       tags={faq.tags}
+      relatedFaqs={relatedFaqs}
     />
   );
 });

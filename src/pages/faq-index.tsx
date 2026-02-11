@@ -22,6 +22,12 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '');
 }
 
+function formatDate(dateStr?: string): string {
+  if (!dateStr) return '';
+  const d = new Date(dateStr.replace(' ', 'T') + 'Z');
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 export const FaqIndexPage: FC<FaqIndexProps> = ({ faqs, categories, currentCategory, page, totalPages }) => {
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -62,7 +68,7 @@ export const FaqIndexPage: FC<FaqIndexProps> = ({ faqs, categories, currentCateg
             <div class="meta">
               {faq.isFeatured && <span class="pill-sm" style="background:var(--color-gold-pale);color:var(--color-gold)">Featured</span>}
               {faq.categoryName && <span class="pill-sm pill-category">{faq.categoryName}</span>}
-              <span>Updated {faq.updatedAt?.split('T')[0]}</span>
+              <span>Updated {formatDate(faq.updatedAt)}</span>
             </div>
           </div>
         ))}

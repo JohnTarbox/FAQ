@@ -8,6 +8,7 @@ interface GlossaryIndexProps {
     slug: string;
     shortDefinition: string;
     abbreviation?: string | null;
+    acronymExpansion?: string | null;
     longDefinition?: string | null;
   }>;
 }
@@ -66,7 +67,11 @@ export const GlossaryIndexPage: FC<GlossaryIndexProps> = ({ terms }) => {
               <>
                 <dt>
                   <a href={`/glossary/${t.slug}`}>{t.term}</a>
-                  {t.abbreviation && <span style="font-weight:400;color:var(--color-ink-muted);font-size:14px;margin-left:6px">({t.abbreviation})</span>}
+                  {(t.acronymExpansion || (t.abbreviation && t.abbreviation !== t.term)) && (
+                    <span style="font-weight:400;color:var(--color-ink-muted);font-size:14px;margin-left:6px">
+                      ({t.acronymExpansion || t.abbreviation})
+                    </span>
+                  )}
                 </dt>
                 <dd>
                   {t.shortDefinition}

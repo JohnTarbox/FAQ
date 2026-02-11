@@ -88,9 +88,12 @@ export class FaqService {
       question: schema.faqVersions.question,
       answer: schema.faqVersions.answer,
       updatedAt: schema.faqVersions.updatedAt,
+      categoryName: schema.faqCategories.name,
+      categorySlug: schema.faqCategories.slug,
     })
     .from(schema.faqEntries)
     .innerJoin(schema.faqVersions, eq(schema.faqEntries.liveVersionId, schema.faqVersions.id))
+    .leftJoin(schema.faqCategories, eq(schema.faqEntries.categoryId, schema.faqCategories.id))
     .$dynamic();
 
     if (opts.categorySlug) {
