@@ -3,6 +3,14 @@ main = "src/index.ts"
 compatibility_date = "2025-01-15"
 compatibility_flags = ["nodejs_compat"]
 
+routes = [
+  { pattern = "faq.aprs.works", custom_domain = true }
+]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
 # D1 Database
 [[d1_databases]]
 binding = "DB"
@@ -21,7 +29,7 @@ bucket_name = "faq-glossary-images"
 
 # Environment variables
 [vars]
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"
 
 # Dev settings
 [dev]

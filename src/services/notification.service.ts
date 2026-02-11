@@ -75,7 +75,7 @@ export class NotificationService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'Fair CMS <noreply@fair.example.com>',
+          from: 'FAQ CMS <noreply@aprs.works>',
           to: [to],
           subject,
           text: body,

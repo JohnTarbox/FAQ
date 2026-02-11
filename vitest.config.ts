@@ -10,6 +10,7 @@ export default defineWorkersConfig({
           d1Databases: ['DB'],
           kvNamespaces: ['CACHE'],
           r2Buckets: ['IMAGES'],
+          bindings: { ENVIRONMENT: 'development' },
         },
       },
     },

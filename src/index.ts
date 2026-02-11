@@ -39,4 +39,29 @@ app.route('/api/admin/images', adminImageRoutes);
 // Health check
 app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
+// Root redirect
+app.get('/', (c) => c.redirect('/faq'));
+
+// Public image serving from R2
+app.get('/images/*', async (c) => {
+  const key = c.req.path.slice(1); // strip leading slash → "images/..."
+  const object = await c.env.IMAGES.get(key);
+  if (!object) return c.notFound();
+
+  const headers = new Headers();
+  object.writeHttpMetadata(headers);
+  headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+  headers.set('ETag', object.httpEtag);
+
+  return new Response(object.body, { headers });
+});
+
+// Admin SPA fallback — static assets are served automatically by Workers Assets
+// for files that exist on disk. Client-side routes fall through to the Worker.
+app.get('/admin', (c) => c.redirect('/admin/'));
+app.get('/admin/*', async (c) => {
+  const assetUrl = new URL('/admin/index.html', c.req.url);
+  return c.env.ASSETS.fetch(assetUrl);
+});
+
 export default app;
