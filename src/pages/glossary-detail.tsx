@@ -29,7 +29,7 @@ export const GlossaryDetailPage: FC<GlossaryDetailProps> = (props) => {
   const safeExample = props.exampleUsage ? sanitizeHtml(props.exampleUsage) : null;
 
   return (
-    <Layout title={props.term} description={props.shortDefinition} jsonLd={jsonLd}>
+    <Layout title={props.term} description={props.shortDefinition} jsonLd={jsonLd} currentPath="/glossary">
       <nav class="breadcrumb">
         <a href="/">Home</a> <span>›</span> <a href="/glossary">Glossary</a> <span>›</span> {props.term}
       </nav>

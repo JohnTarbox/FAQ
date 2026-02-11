@@ -33,7 +33,7 @@ export const FaqDetailPage: FC<FaqDetailProps> = ({ question, answer, slug, cate
   const hasRelated = relatedFaqs && relatedFaqs.length > 0;
 
   return (
-    <Layout title={question} description={stripHtml(answer).substring(0, 160)} jsonLd={breadcrumbLd}>
+    <Layout title={question} description={stripHtml(answer).substring(0, 160)} jsonLd={breadcrumbLd} currentPath="/faq">
       <nav class="breadcrumb">
         <a href="/">Home</a> <span>›</span> <a href="/faq">FAQ</a>
         {category && <><span>›</span> <a href={`/faq?category=${category.slug}`}>{category.name}</a></>}

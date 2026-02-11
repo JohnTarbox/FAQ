@@ -40,7 +40,7 @@ export const FaqIndexPage: FC<FaqIndexProps> = ({ faqs, categories, currentCateg
   };
 
   return (
-    <Layout title="Frequently Asked Questions" description="Find answers to common questions about the State Fair." jsonLd={jsonLd}>
+    <Layout title="Frequently Asked Questions" description="Find answers to common questions about APRS." jsonLd={jsonLd} currentPath="/faq">
       <nav class="breadcrumb">
         <a href="/">Home</a> <span>›</span> FAQ
       </nav>

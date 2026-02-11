@@ -38,7 +38,7 @@ export const GlossaryIndexPage: FC<GlossaryIndexProps> = ({ terms }) => {
   };
 
   return (
-    <Layout title="Glossary" description="Definitions of common fair, agricultural, and 4-H terms." jsonLd={jsonLd}>
+    <Layout title="Glossary" description="Definitions of APRS terms, abbreviations, and acronyms." jsonLd={jsonLd} currentPath="/glossary">
       <nav class="breadcrumb">
         <a href="/">Home</a> <span>›</span> Glossary
       </nav>

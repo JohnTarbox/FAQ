@@ -12,7 +12,7 @@ export const HomePage: FC = () => {
   };
 
   return (
-    <Layout title="Home" description="APRS Foundation — FAQ and Glossary for the Automatic Packet Reporting System (APRS)." jsonLd={jsonLd}>
+    <Layout title="Home" description="APRS Foundation — FAQ and Glossary for the Automatic Packet Reporting System (APRS)." jsonLd={jsonLd} currentPath="/">
       {raw(`<style>${homeCSS}</style>`)}
 
       <div class="home-hero">

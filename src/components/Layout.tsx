@@ -1,12 +1,12 @@
 import type { FC, PropsWithChildren } from 'hono/jsx';
 import { raw } from 'hono/html';
 
-export const Layout: FC<PropsWithChildren<{ title: string; description?: string; jsonLd?: object }>> = ({ title, description, jsonLd, children }) => (
+export const Layout: FC<PropsWithChildren<{ title: string; description?: string; jsonLd?: object; currentPath?: string }>> = ({ title, description, jsonLd, currentPath, children }) => (
   <html lang="en">
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>{title} — State Fair FAQ &amp; Glossary</title>
+      <title>{title} — APRS FAQ &amp; Glossary</title>
       {description && <meta name="description" content={description} />}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -15,6 +15,17 @@ export const Layout: FC<PropsWithChildren<{ title: string; description?: string;
       {jsonLd && raw(`<script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`)}
     </head>
     <body>
+      <header class="site-header">
+        <nav class="site-nav">
+          <a href="/" class="site-nav-brand">APRS Foundation</a>
+          <div class="site-nav-links">
+            <a href="/" class={currentPath === '/' ? 'active' : ''}>Home</a>
+            <a href="/faq" class={currentPath?.startsWith('/faq') ? 'active' : ''}>FAQ</a>
+            <a href="/glossary" class={currentPath?.startsWith('/glossary') ? 'active' : ''}>Glossary</a>
+            <a href="/admin/" class={currentPath?.startsWith('/admin') ? 'active' : ''}>Admin</a>
+          </div>
+        </nav>
+      </header>
       <div class="public-container">
         {children}
       </div>
@@ -38,6 +49,14 @@ const publicCSS = `
 }
 body{font-family:var(--font-body);color:var(--color-ink);background:var(--color-cream);line-height:1.6;-webkit-font-smoothing:antialiased}
 a{color:var(--color-rust);text-decoration:none}a:hover{color:var(--color-rust-light)}
+.site-header{background:var(--color-ink);position:sticky;top:0;z-index:1000}
+.site-nav{max-width:960px;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:48px}
+.site-nav-brand{font-family:var(--font-display);font-size:16px;font-weight:600;color:#fff}
+.site-nav-brand:hover{color:var(--color-rust-light)}
+.site-nav-links{display:flex;gap:2px}
+.site-nav-links a{font-family:var(--font-ui);font-size:13px;font-weight:500;color:rgba(255,255,255,.55);padding:6px 14px;border-radius:var(--radius-sm);transition:background .15s,color .15s}
+.site-nav-links a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.site-nav-links a.active{color:#fff;background:var(--color-rust)}
 .public-container{max-width:960px;margin:0 auto;padding:0 24px}
 .breadcrumb{font-family:var(--font-ui);font-size:13px;color:var(--color-ink-muted);padding:16px 0}
 .breadcrumb a{color:var(--color-ink-muted)}.breadcrumb a:hover{color:var(--color-rust)}
