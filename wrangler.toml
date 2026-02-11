@@ -15,12 +15,12 @@ binding = "ASSETS"
 [[d1_databases]]
 binding = "DB"
 database_name = "faq-glossary-db"
-database_id = "placeholder-change-me"
+database_id = "6069ca96-833e-4115-85b8-4c53dc106469"
 
 # KV Namespace (cache)
 [[kv_namespaces]]
 binding = "CACHE"
-id = "placeholder-change-me"
+id = "294f05e62ae84ef4a54b085ed0b6a2bb"
 
 # R2 Bucket (images)
 [[r2_buckets]]
