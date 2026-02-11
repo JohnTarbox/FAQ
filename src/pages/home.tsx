@@ -8,11 +8,11 @@ export const HomePage: FC = () => {
     '@type': 'WebSite',
     name: 'APRS Foundation FAQ & Glossary',
     url: 'https://faq.aprs.works/',
-    description: 'Answers and definitions for the Arkansas Philological Research Society.',
+    description: 'Answers and definitions for the Automatic Packet Reporting System (APRS).',
   };
 
   return (
-    <Layout title="Home" description="APRS Foundation — FAQ and Glossary for the Arkansas Philological Research Society." jsonLd={jsonLd}>
+    <Layout title="Home" description="APRS Foundation — FAQ and Glossary for the Automatic Packet Reporting System (APRS)." jsonLd={jsonLd}>
       {raw(`<style>${homeCSS}</style>`)}
 
       <div class="home-hero">
@@ -20,7 +20,7 @@ export const HomePage: FC = () => {
         <p class="home-subtitle">FAQ &amp; Glossary</p>
         <p class="home-description">
           Your reference for frequently asked questions and terminology
-          from the Arkansas Philological Research Society.
+          for the Automatic Packet Reporting System (APRS).
         </p>
       </div>
 
