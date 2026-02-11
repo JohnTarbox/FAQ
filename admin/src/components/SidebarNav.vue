@@ -14,7 +14,7 @@ const navItems = [
 
 <template>
   <aside class="sidebar">
-    <div class="sidebar-logo">Fair CMS</div>
+    <div class="sidebar-logo">APRS Admin</div>
     <nav>
       <router-link
         v-for="item in navItems"
