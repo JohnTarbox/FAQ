@@ -30,6 +30,7 @@ bucket_name = "faq-glossary-images"
 # Environment variables
 [vars]
 ENVIRONMENT = "production"
+OKTA_DOMAIN = "aprsfoundation.okta.com"
 
 # Dev settings
 [dev]

@@ -1,7 +1,18 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { computed } from 'vue';
+import { useAuth } from '../composables/useAuth';
 
-const router = useRouter();
+const { user, logout } = useAuth();
+
+const initials = computed(() => {
+  if (!user.value?.email) return '??';
+  const local = user.value.email.split('@')[0];
+  const parts = local.split(/[._-]/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return local.slice(0, 2).toUpperCase();
+});
 
 const navItems = [
   { name: 'Dashboard', route: '/', icon: '▦' },
@@ -28,10 +39,10 @@ const navItems = [
       </router-link>
     </nav>
     <div class="sidebar-user">
-      <div class="avatar">AD</div>
+      <div class="avatar">{{ initials }}</div>
       <div class="user-info">
-        <div class="user-name">Admin User</div>
-        <div class="signout">Sign out</div>
+        <div class="user-name">{{ user?.email || 'Unknown' }}</div>
+        <div class="signout" @click="logout">Sign out</div>
       </div>
     </div>
   </aside>

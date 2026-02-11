@@ -12,11 +12,7 @@ async function request<T>(path: string, opts: RequestInit = {}): Promise<T> {
     headers['Content-Type'] = 'application/json';
   }
 
-  // In dev mode, send mock auth headers
-  headers['X-Mock-User-Email'] = localStorage.getItem('mockEmail') || 'admin@fair.example.com';
-  headers['X-Mock-User-Role'] = localStorage.getItem('mockRole') || 'admin';
-
-  const res = await fetch(`${BASE}${path}`, { ...opts, headers });
+  const res = await fetch(`${BASE}${path}`, { ...opts, headers, credentials: 'same-origin' });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));

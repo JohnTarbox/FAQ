@@ -1,18 +1,8 @@
 import { createMiddleware } from 'hono/factory';
 import type { AppEnv } from '../index';
+import { getSession } from '../services/session.service';
 
 export type UserRole = 'admin' | 'reviewer' | 'author';
-
-interface CfAccessJwtPayload {
-  email: string;
-  sub: string;
-  iss: string;
-  iat: number;
-  exp: number;
-  custom?: {
-    groups?: string[];
-  };
-}
 
 const ROLE_HIERARCHY: Record<UserRole, number> = {
   admin: 3,
@@ -30,8 +20,14 @@ export function hasMinRole(userRole: UserRole, requiredRole: UserRole): boolean 
   return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
 }
 
+function getSessionIdFromCookie(cookieHeader: string | undefined): string | null {
+  if (!cookieHeader) return null;
+  const match = cookieHeader.match(/(?:^|;\s*)session_id=([^;]+)/);
+  return match ? match[1] : null;
+}
+
 export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
-  // In development, allow a mock auth header
+  // In development, allow mock auth headers
   if (c.env.ENVIRONMENT === 'development') {
     const mockEmail = c.req.header('X-Mock-User-Email');
     const mockRole = c.req.header('X-Mock-User-Role') as UserRole | undefined;
@@ -42,33 +38,21 @@ export const authMiddleware = createMiddleware<AppEnv>(async (c, next) => {
     }
   }
 
-  // Cloudflare Access sets Cf-Access-Jwt-Assertion header
-  const jwtToken = c.req.header('Cf-Access-Jwt-Assertion');
-  if (!jwtToken) {
+  // Read session from cookie
+  const sessionId = getSessionIdFromCookie(c.req.header('Cookie'));
+  if (!sessionId) {
     return c.json({ error: 'Authentication required' }, 401);
   }
 
-  try {
-    const payload = parseJwt(jwtToken);
-
-    if (!payload.email) {
-      return c.json({ error: 'Invalid token: missing email' }, 401);
-    }
-
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-      return c.json({ error: 'Token expired' }, 401);
-    }
-
-    const groups = payload.custom?.groups || [];
-    const role = resolveRole(groups);
-
-    c.set('userEmail', payload.email);
-    c.set('userRole', role);
-
-    return next();
-  } catch {
-    return c.json({ error: 'Invalid token' }, 401);
+  const session = await getSession(c.env.CACHE, sessionId);
+  if (!session) {
+    return c.json({ error: 'Session expired' }, 401);
   }
+
+  c.set('userEmail', session.email);
+  c.set('userRole', session.role);
+
+  return next();
 });
 
 export function requireRole(minRole: UserRole) {
@@ -79,12 +63,4 @@ export function requireRole(minRole: UserRole) {
     }
     return next();
   });
-}
-
-function parseJwt(token: string): CfAccessJwtPayload {
-  const parts = token.split('.');
-  if (parts.length !== 3) throw new Error('Invalid JWT');
-  const payload = parts[1];
-  const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-  return JSON.parse(decoded);
 }

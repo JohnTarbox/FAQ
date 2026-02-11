@@ -11,6 +11,7 @@ import { adminTagRoutes } from './api/admin/tags.routes';
 import { adminImportRoutes } from './api/admin/import.routes';
 import { adminImageRoutes } from './api/admin/images.routes';
 import { authMiddleware } from './middleware/auth';
+import { authRoutes } from './api/auth.routes';
 import { pageRoutes } from './pages/routes';
 
 export type AppEnv = { Bindings: Env; Variables: { userEmail: string; userRole: string } };
@@ -22,6 +23,9 @@ app.use('/api/*', cors());
 
 // Public page routes (server-rendered HTML)
 app.route('/', pageRoutes);
+
+// Auth routes (no auth middleware — must be accessible pre-login)
+app.route('/auth', authRoutes);
 
 // Public API routes
 app.route('/api/faq', faqRoutes);

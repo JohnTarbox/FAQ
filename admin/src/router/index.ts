@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuth } from '../composables/useAuth';
 
 const routes = [
   { path: '/', name: 'dashboard', component: () => import('../pages/DashboardPage.vue') },
@@ -15,4 +16,13 @@ const routes = [
 export const router = createRouter({
   history: createWebHistory('/admin/'),
   routes,
+});
+
+router.beforeEach(async () => {
+  const { checkAuth } = useAuth();
+  const authenticated = await checkAuth();
+  if (!authenticated) {
+    window.location.href = `/auth/login?redirect=${encodeURIComponent(window.location.pathname)}`;
+    return false;
+  }
 });
