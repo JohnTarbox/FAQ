@@ -65,7 +65,7 @@ export async function getAuthorizationUrl(
     code_challenge_method: 'S256',
   });
 
-  return `https://${config.domain}/oauth2/default/v1/authorize?${params}`;
+  return `https://${config.domain}/oauth2/v1/authorize?${params}`;
 }
 
 export async function handleCallback(
@@ -89,7 +89,7 @@ export async function handleCallback(
     code_verifier: pkceState.codeVerifier,
   });
 
-  const res = await fetch(`https://${config.domain}/oauth2/default/v1/token`, {
+  const res = await fetch(`https://${config.domain}/oauth2/v1/token`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body.toString(),
@@ -109,5 +109,5 @@ export function getLogoutUrl(config: OktaConfig, postLogoutRedirectUri: string, 
     post_logout_redirect_uri: postLogoutRedirectUri,
   });
   if (idToken) params.set('id_token_hint', idToken);
-  return `https://${config.domain}/oauth2/default/v1/logout?${params}`;
+  return `https://${config.domain}/oauth2/v1/logout?${params}`;
 }

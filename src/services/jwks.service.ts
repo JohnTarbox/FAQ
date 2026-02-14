@@ -52,7 +52,7 @@ async function fetchJwks(
     if (cached) return (JSON.parse(cached) as JWKSResponse).keys;
   }
 
-  const url = `https://${oktaDomain}/oauth2/default/v1/keys`;
+  const url = `https://${oktaDomain}/oauth2/v1/keys`;
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Failed to fetch JWKS: ${res.status}`);
 
@@ -112,7 +112,7 @@ export async function verifyIdToken(
     const now = Math.floor(Date.now() / 1000);
 
     if (payload.exp < now) throw new Error('Token expired');
-    if (payload.iss !== `https://${oktaDomain}/oauth2/default`) {
+    if (payload.iss !== `https://${oktaDomain}`) {
       throw new Error(`Invalid issuer: ${payload.iss}`);
     }
     if (payload.aud !== clientId) {
