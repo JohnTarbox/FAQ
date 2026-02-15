@@ -72,7 +72,15 @@ authRoutes.get('/callback', async (c) => {
       config.domain
     );
 
-    const groups = payload.groups || [];
+    // Fetch groups from userinfo endpoint (Org AS doesn't embed groups in ID token)
+    const userinfoRes = await fetch(`https://${config.domain}/oauth2/v1/userinfo`, {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
+    });
+    let groups: string[] = [];
+    if (userinfoRes.ok) {
+      const userinfo = (await userinfoRes.json()) as { groups?: string[] };
+      groups = userinfo.groups || [];
+    }
     const role = resolveRole(groups);
 
     const sessionId = await createSession(c.env.CACHE, {
