@@ -33,6 +33,23 @@ function clearSessionCookie(env: string): string {
   return `session_id=; HttpOnly; SameSite=Lax; Path=/${secure}; Max-Age=0`;
 }
 
+async function fetchOktaGroups(domain: string, accessToken: string, userId: string): Promise<string[]> {
+  try {
+    const res = await fetch(`https://${domain}/api/v1/users/${userId}/groups`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    if (!res.ok) {
+      console.error(`Failed to fetch Okta groups: ${res.status}`);
+      return [];
+    }
+    const groups = (await res.json()) as Array<{ profile: { name: string } }>;
+    return groups.map((g) => g.profile.name);
+  } catch (err) {
+    console.error('Error fetching Okta groups:', err);
+    return [];
+  }
+}
+
 // GET /auth/login — redirect to Okta
 authRoutes.get('/login', async (c) => {
   if (c.env.ENVIRONMENT === 'development') {
@@ -72,15 +89,9 @@ authRoutes.get('/callback', async (c) => {
       config.domain
     );
 
-    // Fetch groups from userinfo endpoint (Org AS doesn't embed groups in ID token)
-    const userinfoRes = await fetch(`https://${config.domain}/oauth2/v1/userinfo`, {
-      headers: { Authorization: `Bearer ${tokens.access_token}` },
-    });
-    let groups: string[] = [];
-    if (userinfoRes.ok) {
-      const userinfo = (await userinfoRes.json()) as { groups?: string[] };
-      groups = userinfo.groups || [];
-    }
+    // Fetch user's groups via Okta REST API
+    // (Org AS doesn't support the `groups` scope or embed groups in userinfo)
+    const groups = await fetchOktaGroups(config.domain, tokens.access_token, payload.sub);
     const role = resolveRole(groups);
 
     const sessionId = await createSession(c.env.CACHE, {
