@@ -3,6 +3,7 @@
 export interface SessionData {
   email: string;
   role: string;
+  groups: string[];
   idToken?: string;
   createdAt: number;
 }

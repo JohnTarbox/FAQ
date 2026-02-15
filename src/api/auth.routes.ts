@@ -86,6 +86,7 @@ authRoutes.get('/callback', async (c) => {
     const sessionId = await createSession(c.env.CACHE, {
       email: payload.email,
       role,
+      groups,
       idToken: tokens.id_token,
     });
 
@@ -145,6 +146,7 @@ authRoutes.get('/me', async (c) => {
     return c.json({
       email: 'admin@dev.local',
       role: 'admin',
+      groups: ['CMS-Admins'],
     });
   }
 
@@ -158,5 +160,5 @@ authRoutes.get('/me', async (c) => {
     return c.json({ error: 'Session expired' }, 401);
   }
 
-  return c.json({ email: session.email, role: session.role });
+  return c.json({ email: session.email, role: session.role, groups: session.groups || [] });
 });

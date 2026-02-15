@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 interface User {
   email: string;
   role: string;
+  groups: string[];
 }
 
 const user = ref<User | null>(null);

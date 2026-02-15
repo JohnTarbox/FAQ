@@ -42,6 +42,7 @@ const navItems = [
       <div class="avatar">{{ initials }}</div>
       <div class="user-info">
         <div class="user-name">{{ user?.email || 'Unknown' }}</div>
+        <div class="user-groups" v-if="user?.groups?.length">{{ user.groups.join(', ') }}</div>
         <div class="signout" @click="logout">Sign out</div>
       </div>
     </div>
@@ -99,6 +100,7 @@ nav { flex: 1; }
 }
 .user-info { flex: 1; }
 .user-name { color: #fff; font-weight: 500; }
+.user-groups { color: rgba(255,255,255,0.4); font-size: 11px; margin-top: 2px; }
 .signout { color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; }
 .signout:hover { color: rgba(255,255,255,0.7); }
 </style>
