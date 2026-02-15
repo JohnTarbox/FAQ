@@ -8,4 +8,5 @@ export interface Env {
   OKTA_DOMAIN: string;
   OKTA_CLIENT_ID: string;
   OKTA_CLIENT_SECRET: string;
+  OKTA_API_TOKEN: string;
 }

@@ -33,13 +33,13 @@ function clearSessionCookie(env: string): string {
   return `session_id=; HttpOnly; SameSite=Lax; Path=/${secure}; Max-Age=0`;
 }
 
-async function fetchOktaGroups(domain: string, accessToken: string, userId: string): Promise<string[]> {
+async function fetchOktaGroups(domain: string, apiToken: string, userId: string): Promise<string[]> {
   try {
     const res = await fetch(`https://${domain}/api/v1/users/${userId}/groups`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
+      headers: { Authorization: `SSWS ${apiToken}` },
     });
     if (!res.ok) {
-      console.error(`Failed to fetch Okta groups: ${res.status}`);
+      console.error(`Failed to fetch Okta groups: ${res.status} ${await res.text()}`);
       return [];
     }
     const groups = (await res.json()) as Array<{ profile: { name: string } }>;
@@ -89,9 +89,9 @@ authRoutes.get('/callback', async (c) => {
       config.domain
     );
 
-    // Fetch user's groups via Okta REST API
-    // (Org AS doesn't support the `groups` scope or embed groups in userinfo)
-    const groups = await fetchOktaGroups(config.domain, tokens.access_token, payload.sub);
+    // Fetch user's groups via Okta REST API using API token
+    // (Org AS access tokens lack permission to call management APIs)
+    const groups = await fetchOktaGroups(config.domain, c.env.OKTA_API_TOKEN, payload.sub);
     const role = resolveRole(groups);
 
     const sessionId = await createSession(c.env.CACHE, {
