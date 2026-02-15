@@ -42,8 +42,8 @@ async function fetchOktaGroups(domain: string, apiToken: string, userId: string)
       console.error(`Failed to fetch Okta groups: ${res.status} ${await res.text()}`);
       return [];
     }
-    const groups = (await res.json()) as Array<{ profile: { name: string } }>;
-    return groups.map((g) => g.profile.name);
+    const allGroups = (await res.json()) as Array<{ profile: { name: string } }>;
+    return allGroups.map((g) => g.profile.name).filter((name) => name.startsWith('CMS-'));
   } catch (err) {
     console.error('Error fetching Okta groups:', err);
     return [];
