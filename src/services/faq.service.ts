@@ -153,6 +153,7 @@ export class FaqService {
       status: schema.faqVersions.status,
       versionNumber: schema.faqVersions.versionNumber,
       authorEmail: schema.faqVersions.authorEmail,
+      reviewerEmail: schema.faqVersions.reviewerEmail,
       updatedAt: schema.faqVersions.updatedAt,
     })
     .from(schema.faqEntries)
