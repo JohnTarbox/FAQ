@@ -10,6 +10,8 @@ import { adminCategoryRoutes } from './api/admin/categories.routes';
 import { adminTagRoutes } from './api/admin/tags.routes';
 import { adminImportRoutes } from './api/admin/import.routes';
 import { adminImageRoutes } from './api/admin/images.routes';
+import { adminNotificationRoutes } from './api/admin/notifications.routes';
+import { adminAuditRoutes } from './api/admin/audit.routes';
 import { authMiddleware } from './middleware/auth';
 import { authRoutes } from './api/auth.routes';
 import { pageRoutes } from './pages/routes';
@@ -39,6 +41,8 @@ app.route('/api/admin/categories', adminCategoryRoutes);
 app.route('/api/admin/tags', adminTagRoutes);
 app.route('/api/admin/import', adminImportRoutes);
 app.route('/api/admin/images', adminImageRoutes);
+app.route('/api/admin/notifications', adminNotificationRoutes);
+app.route('/api/admin/audit', adminAuditRoutes);
 
 // Health check
 app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));

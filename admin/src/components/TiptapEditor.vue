@@ -8,7 +8,10 @@ import TableRow from '@tiptap/extension-table-row';
 import TableCell from '@tiptap/extension-table-cell';
 import TableHeader from '@tiptap/extension-table-header';
 import Placeholder from '@tiptap/extension-placeholder';
-import { watch } from 'vue';
+import { ref, watch } from 'vue';
+import ImagePickerModal from './ImagePickerModal.vue';
+
+const showImagePicker = ref(false);
 
 const props = defineProps<{
   modelValue: string;
@@ -43,10 +46,14 @@ watch(() => props.modelValue, (val) => {
 });
 
 function addImage() {
-  const url = prompt('Image URL:');
-  if (url && editor.value) {
+  showImagePicker.value = true;
+}
+
+function onImageSelected(url: string) {
+  if (editor.value) {
     editor.value.chain().focus().setImage({ src: url }).run();
   }
+  showImagePicker.value = false;
 }
 
 function addLink() {
@@ -76,6 +83,13 @@ function addLink() {
       <button type="button" @click="editor!.chain().focus().toggleCodeBlock().run()" :class="{ active: editor!.isActive('codeBlock') }">Code</button>
     </div>
     <EditorContent :editor="editor" class="editor-content" />
+    <Teleport to="body">
+      <ImagePickerModal
+        v-if="showImagePicker"
+        @select="onImageSelected"
+        @close="showImagePicker = false"
+      />
+    </Teleport>
   </div>
 </template>
 

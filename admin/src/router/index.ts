@@ -11,6 +11,9 @@ const routes = [
   { path: '/glossary/:id', name: 'glossary-edit', component: () => import('../pages/GlossaryEditPage.vue') },
   { path: '/categories', name: 'categories', component: () => import('../pages/CategoriesPage.vue') },
   { path: '/tags', name: 'tags', component: () => import('../pages/TagsPage.vue') },
+  { path: '/images', name: 'images', component: () => import('../pages/ImagesPage.vue') },
+  { path: '/import', name: 'import', component: () => import('../pages/ImportPage.vue') },
+  { path: '/audit', name: 'audit', component: () => import('../pages/AuditLogPage.vue') },
 ];
 
 export const router = createRouter({
