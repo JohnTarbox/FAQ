@@ -15,8 +15,8 @@ interface DiscoveredSource {
 const KNOWN_APRS_SITES = [
   'http://www.aprs.org',
   'https://aprs.fi',
-  'https://www.arrl.org/aprs',
-  'https://aprsdirect.com',
+  'https://www.arrl.org/aprs-mode',
+  'https://aprsdirect.com/views/about.php',
 ];
 
 const MAX_SOURCES_PER_RUN = 10;
