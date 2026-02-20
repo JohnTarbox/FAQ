@@ -163,6 +163,13 @@ export const faqDiscoverySources = sqliteTable('faq_discovery_sources', {
 
 export type DiscoveryRunStatus = 'running' | 'completed' | 'failed';
 
+export interface DiscoveryLogEntry {
+  timestamp: string;
+  level: 'info' | 'warn' | 'error';
+  message: string;
+  detail?: string;
+}
+
 export const faqDiscoveryRuns = sqliteTable('faq_discovery_runs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   status: text('status').$type<DiscoveryRunStatus>().notNull().default('running'),
@@ -171,6 +178,7 @@ export const faqDiscoveryRuns = sqliteTable('faq_discovery_runs', {
   sourcesChecked: integer('sources_checked').notNull().default(0),
   suggestionsCreated: integer('suggestions_created').notNull().default(0),
   errors: text('errors'),
+  log: text('log'),
   batchId: text('batch_id').notNull(),
   startedAt: text('started_at').notNull().default(sql`(datetime('now'))`),
   completedAt: text('completed_at'),

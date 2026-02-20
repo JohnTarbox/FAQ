@@ -144,6 +144,7 @@ CREATE TABLE IF NOT EXISTS faq_discovery_runs (
   sources_checked INTEGER NOT NULL DEFAULT 0,
   suggestions_created INTEGER NOT NULL DEFAULT 0,
   errors TEXT,
+  log TEXT,
   batch_id TEXT NOT NULL,
   started_at TEXT NOT NULL DEFAULT (datetime('now')),
   completed_at TEXT

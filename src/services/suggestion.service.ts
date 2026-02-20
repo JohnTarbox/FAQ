@@ -1,7 +1,7 @@
 import { eq, and, desc, count, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/d1';
 import * as schema from '../db/schema';
-import type { SuggestionStatus } from '../db/schema';
+import type { SuggestionStatus, DiscoveryLogEntry } from '../db/schema';
 import { FaqService } from './faq.service';
 
 export class SuggestionService {
@@ -186,12 +186,40 @@ export class SuggestionService {
       .get();
   }
 
-  async completeRun(id: number, sourcesChecked: number, suggestionsCreated: number) {
+  async getRun(id: number) {
+    return this.db.select()
+      .from(schema.faqDiscoveryRuns)
+      .where(eq(schema.faqDiscoveryRuns.id, id))
+      .get();
+  }
+
+  async appendLog(runId: number, entry: DiscoveryLogEntry) {
+    const run = await this.getRun(runId);
+    if (!run) return;
+
+    const entries: DiscoveryLogEntry[] = run.log ? JSON.parse(run.log) : [];
+    entries.push(entry);
+
+    await this.db.update(schema.faqDiscoveryRuns)
+      .set({ log: JSON.stringify(entries) })
+      .where(eq(schema.faqDiscoveryRuns.id, runId))
+      .run();
+  }
+
+  async updateRunProgress(runId: number, sourcesChecked: number, suggestionsCreated: number) {
+    await this.db.update(schema.faqDiscoveryRuns)
+      .set({ sourcesChecked, suggestionsCreated })
+      .where(eq(schema.faqDiscoveryRuns.id, runId))
+      .run();
+  }
+
+  async completeRun(id: number, sourcesChecked: number, suggestionsCreated: number, errors?: string) {
     await this.db.update(schema.faqDiscoveryRuns)
       .set({
         status: 'completed',
         sourcesChecked,
         suggestionsCreated,
+        errors: errors || null,
         completedAt: new Date().toISOString(),
       })
       .where(eq(schema.faqDiscoveryRuns.id, id))

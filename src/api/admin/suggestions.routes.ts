@@ -33,6 +33,19 @@ adminSuggestionRoutes.get('/runs', requireRole('admin'), async (c) => {
   return c.json(runs);
 });
 
+// GET /api/admin/suggestions/runs/:id — single run with parsed log
+adminSuggestionRoutes.get('/runs/:id', requireRole('admin'), async (c) => {
+  const id = Number(c.req.param('id'));
+  const svc = new SuggestionService(c.env.DB);
+  const run = await svc.getRun(id);
+  if (!run) return c.json({ error: 'Run not found' }, 404);
+
+  return c.json({
+    ...run,
+    log: run.log ? JSON.parse(run.log) : [],
+  });
+});
+
 // GET /api/admin/suggestions/search-terms — list search terms
 adminSuggestionRoutes.get('/search-terms', requireRole('admin'), async (c) => {
   const svc = new SuggestionService(c.env.DB);
@@ -137,10 +150,20 @@ adminSuggestionRoutes.post('/bulk-dismiss', requireRole('reviewer'), async (c) =
   return c.json(results);
 });
 
-// POST /api/admin/suggestions/discover — manual trigger
+// POST /api/admin/suggestions/discover — manual trigger (non-blocking)
 adminSuggestionRoutes.post('/discover', requireRole('admin'), async (c) => {
   const userEmail = c.get('userEmail');
+  const batchId = `batch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+  // Create run record synchronously so we can return its ID
+  const svc = new SuggestionService(c.env.DB);
+  const run = await svc.createRun(userEmail, 'manual', batchId);
+
+  // Run discovery in the background via waitUntil
   const discovery = new DiscoveryService(c.env);
-  const run = await discovery.runDiscovery(userEmail, 'manual');
-  return c.json(run);
+  c.executionCtx.waitUntil(
+    discovery.runDiscovery(userEmail, 'manual', { id: run.id }, batchId)
+  );
+
+  return c.json({ id: run.id, status: 'running' });
 });

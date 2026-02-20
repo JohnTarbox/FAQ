@@ -45,6 +45,10 @@ export function useSuggestions() {
     return api.call(() => api.post<any>('/suggestions/discover'));
   }
 
+  async function getRun(id: number) {
+    return api.call(() => api.get<any>(`/suggestions/runs/${id}`));
+  }
+
   async function loadRuns() {
     const result = await api.call(() => api.get<any[]>('/suggestions/runs'));
     if (result) runs.value = result;
@@ -83,6 +87,7 @@ export function useSuggestions() {
     dismiss,
     bulkDismiss,
     triggerDiscovery,
+    getRun,
     loadRuns,
     loadSearchTerms,
     addSearchTerm,

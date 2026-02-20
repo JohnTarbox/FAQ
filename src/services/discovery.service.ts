@@ -3,6 +3,7 @@ import { AiService } from './ai.service';
 import { SuggestionService } from './suggestion.service';
 import { NotificationService } from './notification.service';
 import type { Env } from '../env';
+import type { DiscoveryLogEntry } from '../db/schema';
 
 interface DiscoveredSource {
   url: string;
@@ -31,21 +32,48 @@ export class DiscoveryService {
     this.aiService = new AiService(env.AI);
   }
 
-  async runDiscovery(triggeredBy: string, triggerType: 'manual' | 'cron') {
-    const batchId = `batch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const run = await this.suggestionService.createRun(triggeredBy, triggerType, batchId);
+  private async log(runId: number, level: DiscoveryLogEntry['level'], message: string, detail?: string) {
+    await this.suggestionService.appendLog(runId, {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      detail,
+    });
+  }
+
+  async runDiscovery(
+    triggeredBy: string,
+    triggerType: 'manual' | 'cron',
+    existingRun?: { id: number },
+    existingBatchId?: string,
+  ) {
+    const batchId = existingBatchId || `batch-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    const run = existingRun || await this.suggestionService.createRun(triggeredBy, triggerType, batchId);
 
     let sourcesChecked = 0;
     let suggestionsCreated = 0;
     const errors: string[] = [];
 
     try {
+      await this.log(run.id, 'info', 'Discovery run started');
+
+      // Log API key warnings
+      if (!this.env.YOUTUBE_API_KEY) {
+        await this.log(run.id, 'warn', 'YouTube API key not configured — YouTube searches will be skipped');
+      }
+      if (!this.env.GOOGLE_SEARCH_API_KEY || !this.env.GOOGLE_SEARCH_CX_ID) {
+        await this.log(run.id, 'warn', 'Google Search API key or CX ID not configured — web searches will be skipped');
+      }
+
       // 1. Load active search terms
       const terms = await this.suggestionService.getActiveSearchTerms();
       if (terms.length === 0) {
+        await this.log(run.id, 'warn', 'No active search terms configured');
         await this.suggestionService.completeRun(run.id, 0, 0);
         return run;
       }
+
+      await this.log(run.id, 'info', `Loaded ${terms.length} active search term${terms.length === 1 ? '' : 's'}`);
 
       // 2. Discover content from all sources
       const allSources: DiscoveredSource[] = [];
@@ -53,22 +81,30 @@ export class DiscoveryService {
       for (const term of terms) {
         const sourceTypes: string[] = JSON.parse(term.sourceTypes || '["web","youtube","site"]');
 
-        try {
-          if (sourceTypes.includes('youtube') && this.env.YOUTUBE_API_KEY) {
+        if (sourceTypes.includes('youtube') && this.env.YOUTUBE_API_KEY) {
+          try {
+            await this.log(run.id, 'info', `Searching YouTube for "${term.term}"...`);
             const ytResults = await this.searchYouTube(term.term);
+            await this.log(run.id, 'info', `YouTube: found ${ytResults.length} results for "${term.term}"`);
             allSources.push(...ytResults);
+          } catch (err) {
+            const detail = err instanceof Error ? err.message : String(err);
+            errors.push(`YouTube search for "${term.term}": ${detail}`);
+            await this.log(run.id, 'error', `YouTube search failed for "${term.term}"`, detail);
           }
-        } catch (err) {
-          errors.push(`YouTube search for "${term.term}": ${err}`);
         }
 
-        try {
-          if (sourceTypes.includes('web') && this.env.GOOGLE_SEARCH_API_KEY && this.env.GOOGLE_SEARCH_CX_ID) {
+        if (sourceTypes.includes('web') && this.env.GOOGLE_SEARCH_API_KEY && this.env.GOOGLE_SEARCH_CX_ID) {
+          try {
+            await this.log(run.id, 'info', `Searching Google for "${term.term}"...`);
             const googleResults = await this.searchGoogle(term.term);
+            await this.log(run.id, 'info', `Google: found ${googleResults.length} results for "${term.term}"`);
             allSources.push(...googleResults);
+          } catch (err) {
+            const detail = err instanceof Error ? err.message : String(err);
+            errors.push(`Google search for "${term.term}": ${detail}`);
+            await this.log(run.id, 'error', `Google search failed for "${term.term}"`, detail);
           }
-        } catch (err) {
-          errors.push(`Google search for "${term.term}": ${err}`);
         }
       }
 
@@ -92,6 +128,9 @@ export class DiscoveryService {
         }
       }
 
+      const alreadyProcessed = allSources.length - newSources.length;
+      await this.log(run.id, 'info', `Found ${newSources.length} new sources (${alreadyProcessed} already processed)`);
+
       // 5. Fetch existing FAQ questions for dedup
       const existingQuestions = await this.getPublishedQuestions();
 
@@ -99,6 +138,8 @@ export class DiscoveryService {
       for (const source of newSources) {
         sourcesChecked++;
         try {
+          await this.log(run.id, 'info', `Processing source: "${source.title}" (${source.url})`);
+
           // For sites, fetch actual content
           let content = source.snippet;
           if (source.sourceType === 'site' && !content) {
@@ -106,11 +147,13 @@ export class DiscoveryService {
           }
 
           if (!content || content.length < 50) {
+            await this.log(run.id, 'info', `Source skipped: content too short`);
             await this.suggestionService.markProcessed(source.url, source.sourceType, source.title, 0, batchId);
             continue;
           }
 
           // Generate suggestions via AI
+          await this.log(run.id, 'info', 'Generating AI suggestions...');
           const aiSuggestions = await this.aiService.generateSuggestions({
             title: source.title,
             content,
@@ -120,6 +163,12 @@ export class DiscoveryService {
 
           // Deduplicate against existing FAQs
           const unique = this.aiService.deduplicateAgainstExisting(aiSuggestions, existingQuestions);
+
+          if (unique.length === 0) {
+            await this.log(run.id, 'warn', `AI generated 0 suggestions from "${source.title}"`);
+          } else {
+            await this.log(run.id, 'info', `AI generated ${unique.length} suggestion${unique.length === 1 ? '' : 's'}`);
+          }
 
           // Store suggestions
           for (const suggestion of unique) {
@@ -140,13 +189,24 @@ export class DiscoveryService {
           }
 
           await this.suggestionService.markProcessed(source.url, source.sourceType, source.title, unique.length, batchId);
+
+          // Update progress counters so polling can display them
+          await this.suggestionService.updateRunProgress(run.id, sourcesChecked, suggestionsCreated);
         } catch (err) {
-          errors.push(`Processing ${source.url}: ${err}`);
+          const detail = err instanceof Error ? err.message : String(err);
+          errors.push(`Processing ${source.url}: ${detail}`);
+          await this.log(run.id, 'error', `Failed to process "${source.title}"`, detail);
         }
       }
 
       // 7. Complete the run
-      await this.suggestionService.completeRun(run.id, sourcesChecked, suggestionsCreated);
+      await this.log(run.id, 'info', `Run completed: ${sourcesChecked} sources checked, ${suggestionsCreated} suggestions created`);
+      await this.suggestionService.completeRun(
+        run.id,
+        sourcesChecked,
+        suggestionsCreated,
+        errors.length > 0 ? JSON.stringify(errors) : undefined,
+      );
 
       // 8. Notify admins if suggestions were created
       if (suggestionsCreated > 0) {
@@ -165,6 +225,7 @@ export class DiscoveryService {
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
+      await this.log(run.id, 'error', 'Run failed with unrecoverable error', errorMsg);
       await this.suggestionService.failRun(run.id, errorMsg);
     }
 

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue';
 import { useSuggestions } from '../composables/useSuggestions';
 import { useAuth } from '../composables/useAuth';
 
 const { user } = useAuth();
 const {
   suggestions, stats, totalPages, loading, error,
-  loadList, loadStats, accept, dismiss, bulkDismiss, triggerDiscovery,
+  loadList, loadStats, accept, dismiss, bulkDismiss, triggerDiscovery, getRun,
 } = useSuggestions();
 
 const statusFilter = ref('new');
@@ -14,6 +14,16 @@ const sourceTypeFilter = ref('');
 const currentPage = ref(1);
 const discovering = ref(false);
 const selectedIds = ref<Set<number>>(new Set());
+
+// Discovery log panel state
+const activeRunId = ref<number | null>(null);
+const activeRunStatus = ref<string>('running');
+const activeRunSourcesChecked = ref(0);
+const activeRunSuggestionsCreated = ref(0);
+const logEntries = ref<Array<{ timestamp: string; level: string; message: string; detail?: string }>>([]);
+const showLogPanel = ref(false);
+const logScrollEl = ref<HTMLElement | null>(null);
+let pollInterval: ReturnType<typeof setInterval> | null = null;
 
 // Preview modal
 const previewSuggestion = ref<any>(null);
@@ -27,6 +37,13 @@ const isAdmin = computed(() => user.value?.role === 'admin');
 
 onMounted(async () => {
   await Promise.all([loadList({ status: 'new' }), loadStats()]);
+});
+
+onUnmounted(() => {
+  if (pollInterval) {
+    clearInterval(pollInterval);
+    pollInterval = null;
+  }
 });
 
 async function applyFilters() {
@@ -49,9 +66,62 @@ async function goToPage(page: number) {
 
 async function handleDiscover() {
   discovering.value = true;
-  await triggerDiscovery();
-  discovering.value = false;
-  await Promise.all([loadList({ status: statusFilter.value || undefined }), loadStats()]);
+  const result = await triggerDiscovery();
+  if (!result || !result.id) {
+    discovering.value = false;
+    return;
+  }
+
+  // Show log panel and start polling
+  activeRunId.value = result.id;
+  activeRunStatus.value = 'running';
+  activeRunSourcesChecked.value = 0;
+  activeRunSuggestionsCreated.value = 0;
+  logEntries.value = [];
+  showLogPanel.value = true;
+
+  pollInterval = setInterval(() => pollRun(result.id), 2000);
+}
+
+async function pollRun(id: number) {
+  const run = await getRun(id);
+  if (!run) return;
+
+  logEntries.value = run.log || [];
+  activeRunStatus.value = run.status;
+  activeRunSourcesChecked.value = run.sourcesChecked || 0;
+  activeRunSuggestionsCreated.value = run.suggestionsCreated || 0;
+
+  // Auto-scroll to bottom
+  await nextTick();
+  if (logScrollEl.value) {
+    logScrollEl.value.scrollTop = logScrollEl.value.scrollHeight;
+  }
+
+  // Stop polling when run is done
+  if (run.status === 'completed' || run.status === 'failed') {
+    if (pollInterval) {
+      clearInterval(pollInterval);
+      pollInterval = null;
+    }
+    discovering.value = false;
+    // Refresh suggestions and stats
+    await Promise.all([loadList({ status: statusFilter.value || undefined }), loadStats()]);
+  }
+}
+
+function dismissLogPanel() {
+  showLogPanel.value = false;
+  activeRunId.value = null;
+  logEntries.value = [];
+}
+
+function formatLogTime(ts: string) {
+  try {
+    return new Date(ts).toLocaleTimeString();
+  } catch {
+    return ts;
+  }
 }
 
 async function handleAccept(id: number) {
@@ -130,6 +200,44 @@ function sourceIcon(type: string) {
       >
         {{ discovering ? 'Discovering…' : 'Discover Now' }}
       </button>
+    </div>
+
+    <!-- Discovery Log Panel -->
+    <div v-if="showLogPanel" class="log-panel">
+      <div class="log-header">
+        <div class="log-title">
+          <span>Discovery Run #{{ activeRunId }}</span>
+          <span class="log-status-badge" :class="`log-status-${activeRunStatus}`">
+            {{ activeRunStatus }}
+          </span>
+        </div>
+        <div class="log-counters">
+          <span class="log-counter">Sources: {{ activeRunSourcesChecked }}</span>
+          <span class="log-counter">Suggestions: {{ activeRunSuggestionsCreated }}</span>
+        </div>
+        <button
+          v-if="activeRunStatus !== 'running'"
+          class="log-close"
+          @click="dismissLogPanel"
+          title="Close"
+        >&times;</button>
+      </div>
+      <div class="log-body" ref="logScrollEl">
+        <div
+          v-for="(entry, i) in logEntries"
+          :key="i"
+          class="log-entry"
+          :class="`log-level-${entry.level}`"
+        >
+          <span class="log-time">{{ formatLogTime(entry.timestamp) }}</span>
+          <span class="log-level-badge" :class="`log-badge-${entry.level}`">{{ entry.level.toUpperCase() }}</span>
+          <span class="log-message">{{ entry.message }}</span>
+          <div v-if="entry.detail" class="log-detail">{{ entry.detail }}</div>
+        </div>
+        <div v-if="logEntries.length === 0 && activeRunStatus === 'running'" class="log-empty">
+          Waiting for updates...
+        </div>
+      </div>
     </div>
 
     <!-- Stats bar -->
@@ -359,4 +467,34 @@ function sourceIcon(type: string) {
 .field-label:first-child { margin-top: 0; }
 .field-input { width: 100%; padding: 8px 12px; font-size: 14px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); font-family: var(--font-ui); box-sizing: border-box; }
 .field-textarea { width: 100%; padding: 8px 12px; font-size: 13px; border: 1.5px solid var(--color-border); border-radius: var(--radius-sm); font-family: monospace; box-sizing: border-box; resize: vertical; }
+
+/* Discovery Log Panel */
+.log-panel { background: #1a1a2e; border-radius: var(--radius-md); margin-bottom: 24px; overflow: hidden; border: 1px solid #2a2a4a; }
+.log-header { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: #16162a; border-bottom: 1px solid #2a2a4a; }
+.log-title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: #e0e0e8; }
+.log-status-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.04em; }
+.log-status-running { background: #2d4a7a; color: #7ab3ff; }
+.log-status-completed { background: #1a4a2a; color: #6fcf97; }
+.log-status-failed { background: #4a1a1a; color: #f07070; }
+.log-counters { display: flex; gap: 12px; margin-left: auto; }
+.log-counter { font-size: 12px; color: #8888a8; font-family: var(--font-ui); }
+.log-close { background: none; border: none; color: #8888a8; font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1; }
+.log-close:hover { color: #e0e0e8; }
+
+.log-body { max-height: 320px; overflow-y: auto; padding: 12px 16px; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; font-size: 12px; line-height: 1.6; }
+.log-body::-webkit-scrollbar { width: 6px; }
+.log-body::-webkit-scrollbar-track { background: transparent; }
+.log-body::-webkit-scrollbar-thumb { background: #3a3a5a; border-radius: 3px; }
+
+.log-entry { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; padding: 2px 0; }
+.log-time { color: #5a5a7a; font-size: 11px; min-width: 70px; }
+.log-level-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 3px; text-align: center; min-width: 40px; }
+.log-badge-info { background: #1a3a2a; color: #6fcf97; }
+.log-badge-warn { background: #3a3a1a; color: #f0c060; }
+.log-badge-error { background: #3a1a1a; color: #f07070; }
+.log-message { color: #c8c8d8; }
+.log-level-warn .log-message { color: #f0c060; }
+.log-level-error .log-message { color: #f07070; }
+.log-detail { width: 100%; padding-left: 126px; color: #7a7a9a; font-size: 11px; word-break: break-all; }
+.log-empty { color: #5a5a7a; font-style: italic; padding: 8px 0; }
 </style>
