@@ -33,7 +33,7 @@ binding = "AI"
 
 # Cron trigger: weekly Sunday 3am UTC
 [triggers]
-crons = ["0 3 * * 0"]
+crons = ["0 3 * * SUN"]
 
 # Environment variables
 [vars]
