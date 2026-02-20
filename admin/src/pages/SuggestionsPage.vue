@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, computed, nextTick } from 'vue';
+import { RouterLink } from 'vue-router';
 import { useSuggestions } from '../composables/useSuggestions';
 import { useAuth } from '../composables/useAuth';
 
@@ -192,6 +193,10 @@ function sourceIcon(type: string) {
   <div>
     <div class="topbar">
       <h1>AI Suggestions</h1>
+      <div class="topbar-links">
+        <RouterLink to="/suggestions/search-terms" class="topbar-link">Search Terms</RouterLink>
+        <RouterLink to="/suggestions/known-sites" class="topbar-link">Known Sites</RouterLink>
+      </div>
       <button
         v-if="isAdmin"
         class="btn btn-primary"
@@ -390,6 +395,9 @@ function sourceIcon(type: string) {
 <style scoped>
 .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .topbar h1 { font-family: var(--font-display); font-size: 26px; font-weight: 700; }
+.topbar-links { display: flex; gap: 8px; margin-left: 16px; }
+.topbar-link { font-size: 13px; font-weight: 500; color: var(--color-rust); text-decoration: none; padding: 6px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); background: var(--color-warm-white); }
+.topbar-link:hover { border-color: var(--color-rust); background: var(--color-rust-pale); }
 
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
 .stat-card { background: var(--color-warm-white); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 20px; }
