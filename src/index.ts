@@ -12,9 +12,11 @@ import { adminImportRoutes } from './api/admin/import.routes';
 import { adminImageRoutes } from './api/admin/images.routes';
 import { adminNotificationRoutes } from './api/admin/notifications.routes';
 import { adminAuditRoutes } from './api/admin/audit.routes';
+import { adminSuggestionRoutes } from './api/admin/suggestions.routes';
 import { authMiddleware } from './middleware/auth';
 import { authRoutes } from './api/auth.routes';
 import { pageRoutes } from './pages/routes';
+import { DiscoveryService } from './services/discovery.service';
 
 export type AppEnv = { Bindings: Env; Variables: { userEmail: string; userRole: string } };
 
@@ -43,6 +45,7 @@ app.route('/api/admin/import', adminImportRoutes);
 app.route('/api/admin/images', adminImageRoutes);
 app.route('/api/admin/notifications', adminNotificationRoutes);
 app.route('/api/admin/audit', adminAuditRoutes);
+app.route('/api/admin/suggestions', adminSuggestionRoutes);
 
 // Health check
 app.get('/api/health', (c) => c.json({ status: 'ok', timestamp: new Date().toISOString() }));
@@ -69,4 +72,12 @@ app.get('/admin/*', async (c) => {
   return c.env.ASSETS.fetch(assetUrl);
 });
 
-export default app;
+async function handleScheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext) {
+  const discovery = new DiscoveryService(env);
+  ctx.waitUntil(discovery.runDiscovery('cron', 'cron'));
+}
+
+export default {
+  fetch: app.fetch,
+  scheduled: handleScheduled,
+};

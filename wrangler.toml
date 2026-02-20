@@ -27,6 +27,14 @@ id = "294f05e62ae84ef4a54b085ed0b6a2bb"
 binding = "IMAGES"
 bucket_name = "faq-glossary-images"
 
+# Workers AI binding
+[ai]
+binding = "AI"
+
+# Cron trigger: weekly Sunday 3am UTC
+[triggers]
+crons = ["0 3 * * 0"]
+
 # Environment variables
 [vars]
 ENVIRONMENT = "production"

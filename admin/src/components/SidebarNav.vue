@@ -44,6 +44,7 @@ const allNavItems: NavItem[] = [
   { name: 'Tags', route: '/tags', icon: '⚑' },
   { name: 'Images', route: '/images', icon: '▣' },
   { name: 'Import', route: '/import', icon: '⇧', adminOnly: true },
+  { name: 'AI Suggestions', route: '/suggestions', icon: '✦', adminOnly: true },
   { name: 'Audit Log', route: '/audit', icon: '☰' },
 ];
 

@@ -134,3 +134,73 @@ export const notifications = sqliteTable('notifications', {
   index('idx_notifications_recipient').on(table.recipientEmail),
   index('idx_notifications_unread').on(table.recipientEmail, table.isRead),
 ]);
+
+// ============================================================
+// AI Suggestion Tables
+// ============================================================
+
+export const faqSearchTerms = sqliteTable('faq_search_terms', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  term: text('term').notNull().unique(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  sourceTypes: text('source_types').notNull().default('["web","youtube","site"]'),
+  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
+  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
+});
+
+export const faqDiscoverySources = sqliteTable('faq_discovery_sources', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  url: text('url').notNull().unique(),
+  sourceType: text('source_type').notNull(),
+  title: text('title'),
+  fetchedAt: text('fetched_at').notNull().default(sql`(datetime('now'))`),
+  suggestionsGenerated: integer('suggestions_generated').notNull().default(0),
+  batchId: text('batch_id'),
+}, (table) => [
+  index('idx_discovery_sources_url').on(table.url),
+  index('idx_discovery_sources_batch').on(table.batchId),
+]);
+
+export type DiscoveryRunStatus = 'running' | 'completed' | 'failed';
+
+export const faqDiscoveryRuns = sqliteTable('faq_discovery_runs', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  status: text('status').$type<DiscoveryRunStatus>().notNull().default('running'),
+  triggeredBy: text('triggered_by').notNull(),
+  triggerType: text('trigger_type').notNull(), // 'manual' | 'cron'
+  sourcesChecked: integer('sources_checked').notNull().default(0),
+  suggestionsCreated: integer('suggestions_created').notNull().default(0),
+  errors: text('errors'),
+  batchId: text('batch_id').notNull(),
+  startedAt: text('started_at').notNull().default(sql`(datetime('now'))`),
+  completedAt: text('completed_at'),
+}, (table) => [
+  index('idx_discovery_runs_status').on(table.status),
+]);
+
+export type SuggestionStatus = 'new' | 'accepted' | 'dismissed';
+
+export const faqSuggestions = sqliteTable('faq_suggestions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  question: text('question').notNull(),
+  answer: text('answer').notNull(),
+  sourceUrl: text('source_url'),
+  sourceTitle: text('source_title'),
+  sourceType: text('source_type').notNull(), // 'web' | 'youtube' | 'site'
+  sourceSnippet: text('source_snippet'),
+  confidenceScore: integer('confidence_score').notNull().default(50),
+  suggestedCategory: text('suggested_category'),
+  suggestedTags: text('suggested_tags'), // JSON array
+  searchKeywords: text('search_keywords'),
+  status: text('status').$type<SuggestionStatus>().notNull().default('new'),
+  reviewedBy: text('reviewed_by'),
+  reviewNote: text('review_note'),
+  acceptedFaqEntryId: integer('accepted_faq_entry_id').references(() => faqEntries.id, { onDelete: 'set null' }),
+  batchId: text('batch_id').notNull(),
+  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
+  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
+}, (table) => [
+  index('idx_suggestions_status').on(table.status),
+  index('idx_suggestions_batch').on(table.batchId),
+  index('idx_suggestions_source_type').on(table.sourceType),
+]);

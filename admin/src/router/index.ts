@@ -14,6 +14,8 @@ const routes = [
   { path: '/images', name: 'images', component: () => import('../pages/ImagesPage.vue') },
   { path: '/import', name: 'import', component: () => import('../pages/ImportPage.vue') },
   { path: '/audit', name: 'audit', component: () => import('../pages/AuditLogPage.vue') },
+  { path: '/suggestions', name: 'suggestions', component: () => import('../pages/SuggestionsPage.vue') },
+  { path: '/suggestions/search-terms', name: 'search-terms', component: () => import('../pages/SearchTermsPage.vue') },
 ];
 
 export const router = createRouter({

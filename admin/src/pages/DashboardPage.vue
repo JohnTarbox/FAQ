@@ -7,17 +7,23 @@ const api = useApi();
 const stats = ref({ total: 0, published: 0, pending: 0, drafts: 0 });
 const pendingReviews = ref<any[]>([]);
 const recentItems = ref<any[]>([]);
+const suggestionStats = ref<Record<string, number>>({ new: 0, accepted: 0, dismissed: 0 });
+const recentSuggestions = ref<any[]>([]);
 
 onMounted(async () => {
-  const [allResult, pendingResult] = await Promise.all([
+  const [allResult, pendingResult, sugStats, sugNew] = await Promise.all([
     api.get<any>('/faq?page=1'),
     api.get<any>('/faq?status=pending_review'),
+    api.get<Record<string, number>>('/suggestions/stats').catch(() => null),
+    api.get<any>('/suggestions?status=new&limit=5').catch(() => null),
   ]);
   if (allResult) stats.value.total = allResult.items?.length || 0;
   if (pendingResult) {
     pendingReviews.value = pendingResult.items || [];
     stats.value.pending = pendingReviews.value.length;
   }
+  if (sugStats) suggestionStats.value = sugStats;
+  if (sugNew) recentSuggestions.value = sugNew.items || [];
 });
 </script>
 
@@ -43,6 +49,25 @@ onMounted(async () => {
       <div class="stat-card">
         <div class="stat-label">Drafts</div>
         <div class="stat-value">{{ stats.drafts }}</div>
+      </div>
+    </div>
+
+    <div class="section" v-if="suggestionStats.new > 0">
+      <h2>AI Suggestions</h2>
+      <div class="stats-row" style="margin-bottom:12px;">
+        <div class="stat-card mini">
+          <div class="stat-label">New</div>
+          <div class="stat-value pending" style="font-size:20px;">{{ suggestionStats.new }}</div>
+        </div>
+        <div class="stat-card mini">
+          <div class="stat-label">Accepted</div>
+          <div class="stat-value published" style="font-size:20px;">{{ suggestionStats.accepted }}</div>
+        </div>
+      </div>
+      <div v-for="s in recentSuggestions" :key="s.id" class="review-item">
+        <div class="review-question">{{ s.question }}</div>
+        <div class="review-author">{{ s.confidenceScore }}% confidence</div>
+        <router-link to="/suggestions" class="btn btn-gold btn-sm">Review</router-link>
       </div>
     </div>
 
