@@ -46,6 +46,8 @@ export const faqVersions = sqliteTable('faq_versions', {
   question: text('question').notNull(),
   answer: text('answer').notNull(),
   searchKeywords: text('search_keywords'),
+  sourceUrl: text('source_url'),
+  sourceTitle: text('source_title'),
   status: text('status').$type<FaqEntryStatus>().notNull().default('draft'),
   rejectionNote: text('rejection_note'),
   authorEmail: text('author_email').notNull(),

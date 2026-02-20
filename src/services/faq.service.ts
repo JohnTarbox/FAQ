@@ -16,6 +16,8 @@ export class FaqService {
     slug: string;
     categoryId?: number;
     searchKeywords?: string;
+    sourceUrl?: string;
+    sourceTitle?: string;
     authorEmail: string;
   }) {
     const entry = await this.db.insert(schema.faqEntries).values({
@@ -30,6 +32,8 @@ export class FaqService {
       question: data.question,
       answer: data.answer,
       searchKeywords: data.searchKeywords,
+      sourceUrl: data.sourceUrl,
+      sourceTitle: data.sourceTitle,
       status: 'draft',
       authorEmail: data.authorEmail,
     }).returning().get();
@@ -191,6 +195,8 @@ export class FaqService {
     question: string;
     answer: string;
     searchKeywords?: string;
+    sourceUrl?: string;
+    sourceTitle?: string;
     authorEmail: string;
   }) {
     const latest = await this.getLatestVersion(entryId);
@@ -202,6 +208,8 @@ export class FaqService {
       question: data.question,
       answer: data.answer,
       searchKeywords: data.searchKeywords,
+      sourceUrl: data.sourceUrl,
+      sourceTitle: data.sourceTitle,
       status: 'draft',
       authorEmail: data.authorEmail,
     }).returning().get();

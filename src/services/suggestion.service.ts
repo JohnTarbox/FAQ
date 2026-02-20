@@ -79,6 +79,8 @@ export class SuggestionService {
       answer,
       slug: `ai-${slug}`,
       searchKeywords: suggestion.searchKeywords || undefined,
+      sourceUrl: suggestion.sourceUrl || undefined,
+      sourceTitle: suggestion.sourceTitle || undefined,
       authorEmail: reviewerEmail,
     });
 

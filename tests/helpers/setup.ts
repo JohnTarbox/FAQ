@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS faq_versions (
   question TEXT NOT NULL,
   answer TEXT NOT NULL,
   search_keywords TEXT,
+  source_url TEXT,
+  source_title TEXT,
   status TEXT NOT NULL DEFAULT 'draft',
   rejection_note TEXT,
   author_email TEXT NOT NULL,

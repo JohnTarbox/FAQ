@@ -10,13 +10,15 @@ interface FaqDetailProps {
   category?: { name: string; slug: string } | null;
   tags: Array<{ name: string; slug: string }>;
   relatedFaqs?: Array<{ question: string; slug: string }>;
+  sourceUrl?: string | null;
+  sourceTitle?: string | null;
 }
 
 function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '');
 }
 
-export const FaqDetailPage: FC<FaqDetailProps> = ({ question, answer, slug, category, tags, relatedFaqs }) => {
+export const FaqDetailPage: FC<FaqDetailProps> = ({ question, answer, slug, category, tags, relatedFaqs, sourceUrl, sourceTitle }) => {
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -50,6 +52,14 @@ export const FaqDetailPage: FC<FaqDetailProps> = ({ question, answer, slug, cate
           </div>
 
           <div class="answer">{raw(safeAnswer)}</div>
+
+          {sourceUrl && (
+            <div class="source-attribution">
+              Source: <a href={sourceUrl} target="_blank" rel="noopener noreferrer">
+                {sourceTitle || sourceUrl}
+              </a>
+            </div>
+          )}
 
           <a href="/faq" class="back-link">← Back to all FAQs</a>
         </div>

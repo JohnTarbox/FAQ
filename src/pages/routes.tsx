@@ -59,6 +59,8 @@ pageRoutes.get('/faq/:slug', async (c) => {
       category={faq.category}
       tags={faq.tags}
       relatedFaqs={relatedFaqs}
+      sourceUrl={faq.version?.sourceUrl}
+      sourceTitle={faq.version?.sourceTitle}
     />
   );
 });

@@ -15,6 +15,8 @@ const id = computed(() => Number(route.params.id));
 const question = ref('');
 const answer = ref('');
 const searchKeywords = ref('');
+const sourceUrl = ref('');
+const sourceTitle = ref('');
 const categoryId = ref<number | undefined>();
 const isFeatured = ref(false);
 const sortOrder = ref(0);
@@ -28,6 +30,8 @@ onMounted(async () => {
       question.value = latest?.question || '';
       answer.value = latest?.answer || '';
       searchKeywords.value = latest?.searchKeywords || '';
+      sourceUrl.value = latest?.sourceUrl || '';
+      sourceTitle.value = latest?.sourceTitle || '';
       categoryId.value = currentFaq.value.categoryId;
       isFeatured.value = currentFaq.value.isFeatured;
       sortOrder.value = currentFaq.value.sortOrder;
@@ -40,10 +44,10 @@ const currentStatus = computed(() => latestVersion.value?.status || 'draft');
 
 async function handleSave() {
   if (isNew.value) {
-    const result = await create({ question: question.value, answer: answer.value, searchKeywords: searchKeywords.value, categoryId: categoryId.value });
+    const result = await create({ question: question.value, answer: answer.value, searchKeywords: searchKeywords.value, sourceUrl: sourceUrl.value || undefined, sourceTitle: sourceTitle.value || undefined, categoryId: categoryId.value });
     if (result) router.push(`/faq/${result.entry.id}`);
   } else {
-    await createVersion(id.value, { question: question.value, answer: answer.value, searchKeywords: searchKeywords.value });
+    await createVersion(id.value, { question: question.value, answer: answer.value, searchKeywords: searchKeywords.value, sourceUrl: sourceUrl.value || undefined, sourceTitle: sourceTitle.value || undefined });
     await update(id.value, { categoryId: categoryId.value, isFeatured: isFeatured.value, sortOrder: sortOrder.value });
     await loadById(id.value);
   }
@@ -136,6 +140,18 @@ async function handleReject() {
           <div class="form-group">
             <label class="form-label">Sort Order</label>
             <input v-model.number="sortOrder" type="number" class="form-input" style="width:80px;">
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Source Attribution</div>
+          <div class="form-group">
+            <label class="form-label">Source URL</label>
+            <input v-model="sourceUrl" type="url" class="form-input" placeholder="https://…">
+          </div>
+          <div class="form-group" style="margin-bottom:0">
+            <label class="form-label">Source Title</label>
+            <input v-model="sourceTitle" type="text" class="form-input" placeholder="Display name for source…">
           </div>
         </div>
 

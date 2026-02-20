@@ -55,6 +55,8 @@ adminFaqRoutes.post('/', async (c) => {
     slug,
     categoryId: body.categoryId,
     searchKeywords: body.searchKeywords,
+    sourceUrl: body.sourceUrl,
+    sourceTitle: body.sourceTitle,
     authorEmail: userEmail,
   });
 
@@ -105,6 +107,8 @@ adminFaqRoutes.post('/:id/version', async (c) => {
     question: body.question,
     answer: body.answer,
     searchKeywords: body.searchKeywords,
+    sourceUrl: body.sourceUrl,
+    sourceTitle: body.sourceTitle,
     authorEmail: userEmail,
   });
 

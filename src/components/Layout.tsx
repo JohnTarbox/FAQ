@@ -30,6 +30,9 @@ export const Layout: FC<PropsWithChildren<{ title: string; description?: string;
         {children}
       </div>
       <footer class="site-footer">
+        {currentPath?.startsWith('/faq') && (
+          <p class="faq-disclaimer">Some FAQ content may be derived from external sources and enhanced with AI assistance. Original sources are cited where applicable.</p>
+        )}
         <p>APRS is a registered trademark of TAPR.</p>
       </footer>
       <script src="/glossary/widget.js" defer />
@@ -123,5 +126,8 @@ a{color:var(--color-rust);text-decoration:none}a:hover{color:var(--color-rust-li
 .sidebar-section li a:hover{color:var(--color-rust)}
 .helpful-btn{padding:8px 20px;font-family:var(--font-ui);font-size:13px;font-weight:500;border:1.5px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-warm-white);cursor:pointer}
 .helpful-btn:hover{border-color:var(--color-rust);color:var(--color-rust)}
+.source-attribution{font-family:var(--font-ui);font-size:13px;color:var(--color-ink-muted);margin-top:24px;padding-top:16px;border-top:1px solid var(--color-border)}
+.source-attribution a{color:var(--color-rust)}
+.faq-disclaimer{color:var(--color-ink-muted);font-size:11px;margin-bottom:8px;font-style:italic}
 @media(max-width:768px){.hero h1{font-size:32px}.faq-detail-layout{grid-template-columns:1fr;gap:24px}}
 `;
