@@ -117,6 +117,15 @@ CREATE TABLE IF NOT EXISTS notifications (
 CREATE INDEX IF NOT EXISTS idx_notifications_recipient ON notifications(recipient_email);
 CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(recipient_email, is_read);
 
+CREATE TABLE IF NOT EXISTS faq_known_sites (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  url TEXT NOT NULL UNIQUE,
+  title TEXT,
+  is_active INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 CREATE TABLE IF NOT EXISTS faq_search_terms (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   term TEXT NOT NULL UNIQUE,

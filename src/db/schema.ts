@@ -141,6 +141,15 @@ export const notifications = sqliteTable('notifications', {
 // AI Suggestion Tables
 // ============================================================
 
+export const faqKnownSites = sqliteTable('faq_known_sites', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  url: text('url').notNull().unique(),
+  title: text('title'),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: text('created_at').notNull().default(sql`(datetime('now'))`),
+  updatedAt: text('updated_at').notNull().default(sql`(datetime('now'))`),
+});
+
 export const faqSearchTerms = sqliteTable('faq_search_terms', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   term: text('term').notNull().unique(),

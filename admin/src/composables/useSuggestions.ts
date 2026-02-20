@@ -7,6 +7,7 @@ export function useSuggestions() {
   const stats = ref<Record<string, number>>({ new: 0, accepted: 0, dismissed: 0 });
   const runs = ref<any[]>([]);
   const searchTerms = ref<any[]>([]);
+  const knownSites = ref<any[]>([]);
   const totalPages = ref(1);
 
   async function loadList(opts: { status?: string; sourceType?: string; page?: number } = {}) {
@@ -73,11 +74,30 @@ export function useSuggestions() {
     return api.call(() => api.del<any>(`/suggestions/search-terms/${id}`));
   }
 
+  async function loadKnownSites() {
+    const result = await api.call(() => api.get<any[]>('/suggestions/known-sites'));
+    if (result) knownSites.value = result;
+    return result;
+  }
+
+  async function addKnownSite(url: string, title?: string) {
+    return api.call(() => api.post<any>('/suggestions/known-sites', { url, title }));
+  }
+
+  async function updateKnownSite(id: number, data: { url?: string; title?: string; isActive?: boolean }) {
+    return api.call(() => api.put<any>(`/suggestions/known-sites/${id}`, data));
+  }
+
+  async function deleteKnownSite(id: number) {
+    return api.call(() => api.del<any>(`/suggestions/known-sites/${id}`));
+  }
+
   return {
     suggestions,
     stats,
     runs,
     searchTerms,
+    knownSites,
     totalPages,
     loading: api.loading,
     error: api.error,
@@ -93,5 +113,9 @@ export function useSuggestions() {
     addSearchTerm,
     updateSearchTerm,
     deleteSearchTerm,
+    loadKnownSites,
+    addKnownSite,
+    updateKnownSite,
+    deleteKnownSite,
   };
 }

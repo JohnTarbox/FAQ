@@ -16,6 +16,7 @@ const routes = [
   { path: '/audit', name: 'audit', component: () => import('../pages/AuditLogPage.vue') },
   { path: '/suggestions', name: 'suggestions', component: () => import('../pages/SuggestionsPage.vue') },
   { path: '/suggestions/search-terms', name: 'search-terms', component: () => import('../pages/SearchTermsPage.vue') },
+  { path: '/suggestions/known-sites', name: 'known-sites', component: () => import('../pages/KnownSitesPage.vue') },
 ];
 
 export const router = createRouter({

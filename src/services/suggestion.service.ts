@@ -291,6 +291,47 @@ export class SuggestionService {
       .run();
   }
 
+  // Known site management
+
+  async getActiveKnownSites() {
+    return this.db.select()
+      .from(schema.faqKnownSites)
+      .where(eq(schema.faqKnownSites.isActive, true))
+      .all();
+  }
+
+  async listKnownSites() {
+    return this.db.select()
+      .from(schema.faqKnownSites)
+      .orderBy(schema.faqKnownSites.url)
+      .all();
+  }
+
+  async addKnownSite(url: string, title?: string) {
+    return this.db.insert(schema.faqKnownSites)
+      .values({ url, title })
+      .returning()
+      .get();
+  }
+
+  async updateKnownSite(id: number, data: { url?: string; title?: string; isActive?: boolean }) {
+    const updates: Record<string, unknown> = { updatedAt: new Date().toISOString() };
+    if (data.url !== undefined) updates.url = data.url;
+    if (data.title !== undefined) updates.title = data.title;
+    if (data.isActive !== undefined) updates.isActive = data.isActive;
+
+    await this.db.update(schema.faqKnownSites)
+      .set(updates)
+      .where(eq(schema.faqKnownSites.id, id))
+      .run();
+  }
+
+  async deleteKnownSite(id: number) {
+    await this.db.delete(schema.faqKnownSites)
+      .where(eq(schema.faqKnownSites.id, id))
+      .run();
+  }
+
   // Discovery source dedup
 
   async isAlreadyProcessed(url: string): Promise<boolean> {

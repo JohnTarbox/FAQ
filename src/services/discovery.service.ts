@@ -12,13 +12,6 @@ interface DiscoveredSource {
   sourceType: 'web' | 'youtube' | 'site';
 }
 
-const KNOWN_APRS_SITES = [
-  'http://www.aprs.org',
-  'https://aprs.fi',
-  'https://www.arrl.org/aprs-mode',
-  'https://aprsdirect.com/views/about.php',
-];
-
 const MAX_SOURCES_PER_RUN = 10;
 
 export class DiscoveryService {
@@ -108,11 +101,14 @@ export class DiscoveryService {
         }
       }
 
-      // 3. Add known APRS sites
-      for (const siteUrl of KNOWN_APRS_SITES) {
+      // 3. Load known sites from DB
+      const knownSites = await this.suggestionService.getActiveKnownSites();
+      await this.log(run.id, 'info', `Loaded ${knownSites.length} known site${knownSites.length === 1 ? '' : 's'}`);
+
+      for (const site of knownSites) {
         allSources.push({
-          url: siteUrl,
-          title: new URL(siteUrl).hostname,
+          url: site.url,
+          title: site.title || new URL(site.url).hostname,
           snippet: '',
           sourceType: 'site',
         });
