@@ -91,6 +91,51 @@ adminSuggestionRoutes.delete('/search-terms/:id', requireRole('admin'), async (c
   return c.json({ success: true });
 });
 
+// GET /api/admin/suggestions/known-sites — list known sites
+adminSuggestionRoutes.get('/known-sites', requireRole('admin'), async (c) => {
+  const svc = new SuggestionService(c.env.DB);
+  const sites = await svc.listKnownSites();
+  return c.json(sites);
+});
+
+// POST /api/admin/suggestions/known-sites — add known site
+adminSuggestionRoutes.post('/known-sites', requireRole('admin'), async (c) => {
+  const body = await c.req.json();
+  if (!body.url) return c.json({ error: 'url is required' }, 400);
+
+  const svc = new SuggestionService(c.env.DB);
+
+  try {
+    const site = await svc.addKnownSite(body.url, body.title);
+    return c.json(site, 201);
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : 'Unknown error';
+    return c.json({ error: msg }, 400);
+  }
+});
+
+// PUT /api/admin/suggestions/known-sites/:id — update known site
+adminSuggestionRoutes.put('/known-sites/:id', requireRole('admin'), async (c) => {
+  const id = Number(c.req.param('id'));
+  const body = await c.req.json();
+  const svc = new SuggestionService(c.env.DB);
+
+  await svc.updateKnownSite(id, {
+    url: body.url,
+    title: body.title,
+    isActive: body.isActive,
+  });
+  return c.json({ success: true });
+});
+
+// DELETE /api/admin/suggestions/known-sites/:id — delete known site
+adminSuggestionRoutes.delete('/known-sites/:id', requireRole('admin'), async (c) => {
+  const id = Number(c.req.param('id'));
+  const svc = new SuggestionService(c.env.DB);
+  await svc.deleteKnownSite(id);
+  return c.json({ success: true });
+});
+
 // GET /api/admin/suggestions/:id — single suggestion detail
 adminSuggestionRoutes.get('/:id', async (c) => {
   const id = Number(c.req.param('id'));
