@@ -187,10 +187,9 @@ JOIN faq_entries fe ON fe.id = fv.entry_id AND fe.live_version_id = fv.id
 WHERE fv.search_keywords IS NULL OR fv.search_keywords = ''
 ```
 
-> **Known issue**: FTS5 uses the default `unicode61` tokenizer (no stemming).
-> Singular/plural mismatches (e.g., "frequency" vs "frequencies") won't match.
-> Workaround: populate `search_keywords` with common variants, or migrate to
-> `tokenize = 'porter unicode61'` for English stemming.
+> **Tokenizer**: FTS5 uses `tokenize='porter unicode61'` (added in migration 0008).
+> The Porter stemmer handles English inflectional variants (e.g., "frequency"
+> matches "frequencies", "station" matches "stations") automatically.
 
 ---
 
@@ -289,5 +288,5 @@ The Drizzle schema is at `src/db/schema.ts`. Key tables:
 | Confidence high (80+) | 48 (92%) |
 | KV cache keys | 2 |
 | Search terms (active) | 10 |
-| FTS5 tokenizer | `unicode61` (no stemming) |
+| FTS5 tokenizer | `porter unicode61` (English stemming) |
 | DB size | ~356 KB |

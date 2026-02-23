@@ -188,12 +188,14 @@ CREATE INDEX IF NOT EXISTS idx_suggestions_source_type ON faq_suggestions(source
 
 CREATE VIRTUAL TABLE IF NOT EXISTS faq_fts USING fts5(
   question, answer, search_keywords,
-  content='faq_versions', content_rowid='id'
+  content='faq_versions', content_rowid='id',
+  tokenize='porter unicode61'
 );
 
 CREATE VIRTUAL TABLE IF NOT EXISTS glossary_fts USING fts5(
   term, short_definition, long_definition, abbreviation, alternate_names,
-  content='glossary_terms', content_rowid='id'
+  content='glossary_terms', content_rowid='id',
+  tokenize='porter unicode61'
 );
 
 CREATE TRIGGER IF NOT EXISTS faq_versions_ai AFTER INSERT ON faq_versions BEGIN

@@ -71,6 +71,27 @@ describe('FAQ Public API', () => {
     const res = await SELF.fetch('http://localhost/api/faq/search');
     expect(res.status).toBe(400);
   });
+
+  it('GET /api/faq/search stems queries (frequency matches frequencies)', async () => {
+    // Seed a published FAQ containing "frequencies"
+    const cat = await env.DB.prepare("SELECT id FROM faq_categories WHERE slug = 'tickets-pricing'").first<{ id: number }>();
+    await env.DB.prepare(
+      "INSERT OR IGNORE INTO faq_entries (slug, category_id, is_featured, sort_order, created_by) VALUES ('stem-test-faq', ?, 0, 0, 'admin@test.com')"
+    ).bind(cat!.id).run();
+    const entry = await env.DB.prepare("SELECT id FROM faq_entries WHERE slug = 'stem-test-faq'").first<{ id: number }>();
+    await env.DB.prepare(
+      "INSERT OR IGNORE INTO faq_versions (entry_id, version_number, question, answer, status, author_email, published_at) VALUES (?, 1, 'What are the APRS frequencies?', '<p>Common APRS frequencies include 144.390 MHz.</p>', 'published', 'admin@test.com', datetime('now'))"
+    ).bind(entry!.id).run();
+    const version = await env.DB.prepare("SELECT id FROM faq_versions WHERE entry_id = ? AND version_number = 1").bind(entry!.id).first<{ id: number }>();
+    await env.DB.prepare("UPDATE faq_entries SET live_version_id = ? WHERE id = ?").bind(version!.id, entry!.id).run();
+
+    // Search for singular "frequency" — porter stemming should match "frequencies"
+    const res = await SELF.fetch('http://localhost/api/faq/search?q=frequency');
+    expect(res.status).toBe(200);
+    const body = await res.json() as any;
+    expect(body.results.length).toBeGreaterThanOrEqual(1);
+    expect(body.results.some((r: any) => r.question?.includes('frequencies'))).toBe(true);
+  });
 });
 
 describe('FAQ Admin API', () => {
