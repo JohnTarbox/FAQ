@@ -4,6 +4,7 @@ import { FaqService } from '../../services/faq.service';
 import { GlossaryService } from '../../services/glossary.service';
 import { CacheService } from '../../services/cache.service';
 import { requireRole } from '../../middleware/auth';
+import { validateBody, importFaqSchema, importGlossarySchema } from '../../validation';
 
 export const adminImportRoutes = new Hono<AppEnv>();
 
@@ -13,22 +14,16 @@ function slugify(text: string): string {
 
 // POST /api/admin/import/faq — bulk import FAQs from JSON
 adminImportRoutes.post('/faq', requireRole('admin'), async (c) => {
-  const body = await c.req.json();
+  const parsed = await validateBody(c, importFaqSchema);
+  if (!parsed.success) return parsed.response;
+  const { items } = parsed.data;
   const userEmail = c.get('userEmail');
-
-  if (!Array.isArray(body.items)) {
-    return c.json({ error: 'items array is required' }, 400);
-  }
 
   const svc = new FaqService(c.env.DB);
   const results = { created: 0, errors: [] as string[] };
 
-  for (const item of body.items) {
+  for (const item of items) {
     try {
-      if (!item.question || !item.answer) {
-        results.errors.push(`Missing question or answer: ${item.question || 'unknown'}`);
-        continue;
-      }
       await svc.create({
         question: item.question,
         answer: item.answer,
@@ -52,22 +47,16 @@ adminImportRoutes.post('/faq', requireRole('admin'), async (c) => {
 
 // POST /api/admin/import/glossary — bulk import glossary terms from JSON
 adminImportRoutes.post('/glossary', requireRole('admin'), async (c) => {
-  const body = await c.req.json();
+  const parsed = await validateBody(c, importGlossarySchema);
+  if (!parsed.success) return parsed.response;
+  const { items } = parsed.data;
   const userEmail = c.get('userEmail');
-
-  if (!Array.isArray(body.items)) {
-    return c.json({ error: 'items array is required' }, 400);
-  }
 
   const svc = new GlossaryService(c.env.DB);
   const results = { created: 0, errors: [] as string[] };
 
-  for (const item of body.items) {
+  for (const item of items) {
     try {
-      if (!item.term || !item.shortDefinition) {
-        results.errors.push(`Missing term or shortDefinition: ${item.term || 'unknown'}`);
-        continue;
-      }
       await svc.create({
         term: item.term,
         slug: item.slug || slugify(item.term),

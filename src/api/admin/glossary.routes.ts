@@ -3,6 +3,7 @@ import type { AppEnv } from '../../index';
 import { GlossaryService } from '../../services/glossary.service';
 import { CacheService } from '../../services/cache.service';
 import { requireRole } from '../../middleware/auth';
+import { validateBody, createGlossarySchema, updateGlossarySchema, createGlossaryCategorySchema } from '../../validation';
 
 export const adminGlossaryRoutes = new Hono<AppEnv>();
 
@@ -33,12 +34,10 @@ adminGlossaryRoutes.get('/:id', async (c) => {
 
 // POST /api/admin/glossary — create new term
 adminGlossaryRoutes.post('/', async (c) => {
-  const body = await c.req.json();
+  const parsed = await validateBody(c, createGlossarySchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
   const userEmail = c.get('userEmail');
-
-  if (!body.term || !body.shortDefinition) {
-    return c.json({ error: 'term and shortDefinition are required' }, 400);
-  }
 
   const svc = new GlossaryService(c.env.DB);
   const slug = body.slug || slugify(body.term);
@@ -66,7 +65,9 @@ adminGlossaryRoutes.post('/', async (c) => {
 // PUT /api/admin/glossary/:id — update term
 adminGlossaryRoutes.put('/:id', async (c) => {
   const id = Number(c.req.param('id'));
-  const body = await c.req.json();
+  const parsed = await validateBody(c, updateGlossarySchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
 
   const svc = new GlossaryService(c.env.DB);
   const existing = await svc.getById(id);
@@ -119,8 +120,9 @@ adminGlossaryRoutes.get('/categories', async (c) => {
 });
 
 adminGlossaryRoutes.post('/categories', requireRole('admin'), async (c) => {
-  const body = await c.req.json();
-  if (!body.name) return c.json({ error: 'name is required' }, 400);
+  const parsed = await validateBody(c, createGlossaryCategorySchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
 
   const svc = new GlossaryService(c.env.DB);
   const slug = body.slug || slugify(body.name);

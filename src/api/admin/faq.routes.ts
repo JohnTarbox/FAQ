@@ -4,6 +4,7 @@ import { FaqService } from '../../services/faq.service';
 import { CacheService } from '../../services/cache.service';
 import { NotificationService } from '../../services/notification.service';
 import { requireRole } from '../../middleware/auth';
+import { validateBody, createFaqSchema, updateFaqEntrySchema, createFaqVersionSchema, rejectFaqSchema } from '../../validation';
 
 export const adminFaqRoutes = new Hono<AppEnv>();
 
@@ -39,12 +40,10 @@ adminFaqRoutes.get('/:id', async (c) => {
 
 // POST /api/admin/faq — create new FAQ
 adminFaqRoutes.post('/', async (c) => {
-  const body = await c.req.json();
+  const parsed = await validateBody(c, createFaqSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
   const userEmail = c.get('userEmail');
-
-  if (!body.question || !body.answer) {
-    return c.json({ error: 'question and answer are required' }, 400);
-  }
 
   const svc = new FaqService(c.env.DB);
   const slug = body.slug || slugify(body.question);
@@ -55,7 +54,7 @@ adminFaqRoutes.post('/', async (c) => {
     slug,
     categoryId: body.categoryId,
     searchKeywords: body.searchKeywords,
-    sourceUrl: body.sourceUrl,
+    sourceUrl: body.sourceUrl || undefined,
     sourceTitle: body.sourceTitle,
     authorEmail: userEmail,
   });
@@ -70,7 +69,9 @@ adminFaqRoutes.post('/', async (c) => {
 // PUT /api/admin/faq/:id — update FAQ entry metadata
 adminFaqRoutes.put('/:id', async (c) => {
   const id = Number(c.req.param('id'));
-  const body = await c.req.json();
+  const parsed = await validateBody(c, updateFaqEntrySchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
   const svc = new FaqService(c.env.DB);
 
   const entry = await svc.getById(id);
@@ -96,7 +97,9 @@ adminFaqRoutes.put('/:id', async (c) => {
 // POST /api/admin/faq/:id/version — create new version for existing FAQ
 adminFaqRoutes.post('/:id/version', async (c) => {
   const id = Number(c.req.param('id'));
-  const body = await c.req.json();
+  const parsed = await validateBody(c, createFaqVersionSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
   const userEmail = c.get('userEmail');
 
   const svc = new FaqService(c.env.DB);
@@ -107,7 +110,7 @@ adminFaqRoutes.post('/:id/version', async (c) => {
     question: body.question,
     answer: body.answer,
     searchKeywords: body.searchKeywords,
-    sourceUrl: body.sourceUrl,
+    sourceUrl: body.sourceUrl || undefined,
     sourceTitle: body.sourceTitle,
     authorEmail: userEmail,
   });
@@ -174,10 +177,10 @@ adminFaqRoutes.post('/version/:versionId/approve', requireRole('reviewer'), asyn
 // POST /api/admin/faq/version/:versionId/reject — reject version
 adminFaqRoutes.post('/version/:versionId/reject', requireRole('reviewer'), async (c) => {
   const versionId = Number(c.req.param('versionId'));
-  const body = await c.req.json();
+  const parsed = await validateBody(c, rejectFaqSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
   const reviewerEmail = c.get('userEmail');
-
-  if (!body.note) return c.json({ error: 'Rejection note is required' }, 400);
 
   const svc = new FaqService(c.env.DB);
 

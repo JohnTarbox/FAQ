@@ -1,9 +1,12 @@
 import type { Ai } from '@cloudflare/workers-types';
+import { eq, isNotNull } from 'drizzle-orm';
+import { drizzle } from 'drizzle-orm/d1';
 import { AiService } from './ai.service';
 import { SuggestionService } from './suggestion.service';
 import { NotificationService } from './notification.service';
 import type { Env } from '../env';
 import type { DiscoveryLogEntry } from '../db/schema';
+import * as schema from '../db/schema';
 
 interface DiscoveredSource {
   url: string;
@@ -338,13 +341,13 @@ export class DiscoveryService {
   }
 
   private async getPublishedQuestions(): Promise<string[]> {
-    // Direct query for efficiency — get all published FAQ questions
-    const results = await this.env.DB.prepare(
-      `SELECT fv.question FROM faq_entries fe
-       INNER JOIN faq_versions fv ON fe.live_version_id = fv.id
-       WHERE fe.live_version_id IS NOT NULL`
-    ).all<{ question: string }>();
+    const db = drizzle(this.env.DB);
+    const results = await db.select({ question: schema.faqVersions.question })
+      .from(schema.faqEntries)
+      .innerJoin(schema.faqVersions, eq(schema.faqEntries.liveVersionId, schema.faqVersions.id))
+      .where(isNotNull(schema.faqEntries.liveVersionId))
+      .all();
 
-    return results.results.map(r => r.question);
+    return results.map(r => r.question);
   }
 }

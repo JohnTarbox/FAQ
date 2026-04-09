@@ -4,6 +4,16 @@ import { SuggestionService } from '../../services/suggestion.service';
 import { DiscoveryService } from '../../services/discovery.service';
 import { requireRole } from '../../middleware/auth';
 import type { SuggestionStatus } from '../../db/schema';
+import {
+  validateBody,
+  createSearchTermSchema,
+  updateSearchTermSchema,
+  createKnownSiteSchema,
+  updateKnownSiteSchema,
+  acceptSuggestionSchema,
+  dismissSuggestionSchema,
+  bulkDismissSchema,
+} from '../../validation';
 
 export const adminSuggestionRoutes = new Hono<AppEnv>();
 
@@ -55,8 +65,9 @@ adminSuggestionRoutes.get('/search-terms', requireRole('admin'), async (c) => {
 
 // POST /api/admin/suggestions/search-terms — add search term
 adminSuggestionRoutes.post('/search-terms', requireRole('admin'), async (c) => {
-  const body = await c.req.json();
-  if (!body.term) return c.json({ error: 'term is required' }, 400);
+  const parsed = await validateBody(c, createSearchTermSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
 
   const svc = new SuggestionService(c.env.DB);
 
@@ -72,7 +83,9 @@ adminSuggestionRoutes.post('/search-terms', requireRole('admin'), async (c) => {
 // PUT /api/admin/suggestions/search-terms/:id — update search term
 adminSuggestionRoutes.put('/search-terms/:id', requireRole('admin'), async (c) => {
   const id = Number(c.req.param('id'));
-  const body = await c.req.json();
+  const parsed = await validateBody(c, updateSearchTermSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
   const svc = new SuggestionService(c.env.DB);
 
   await svc.updateSearchTerm(id, {
@@ -100,8 +113,9 @@ adminSuggestionRoutes.get('/known-sites', requireRole('admin'), async (c) => {
 
 // POST /api/admin/suggestions/known-sites — add known site
 adminSuggestionRoutes.post('/known-sites', requireRole('admin'), async (c) => {
-  const body = await c.req.json();
-  if (!body.url) return c.json({ error: 'url is required' }, 400);
+  const parsed = await validateBody(c, createKnownSiteSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
 
   const svc = new SuggestionService(c.env.DB);
 
@@ -117,7 +131,9 @@ adminSuggestionRoutes.post('/known-sites', requireRole('admin'), async (c) => {
 // PUT /api/admin/suggestions/known-sites/:id — update known site
 adminSuggestionRoutes.put('/known-sites/:id', requireRole('admin'), async (c) => {
   const id = Number(c.req.param('id'));
-  const body = await c.req.json();
+  const parsed = await validateBody(c, updateKnownSiteSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
   const svc = new SuggestionService(c.env.DB);
 
   await svc.updateKnownSite(id, {
@@ -149,14 +165,16 @@ adminSuggestionRoutes.get('/:id', async (c) => {
 adminSuggestionRoutes.post('/:id/accept', requireRole('reviewer'), async (c) => {
   const id = Number(c.req.param('id'));
   const reviewerEmail = c.get('userEmail');
-  const body = await c.req.json().catch(() => ({}));
+  const parsed = await validateBody(c, acceptSuggestionSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
 
   const svc = new SuggestionService(c.env.DB);
 
   try {
     const result = await svc.accept(id, reviewerEmail, {
-      question: body.question,
-      answer: body.answer,
+      question: body?.question,
+      answer: body?.answer,
     });
     return c.json(result);
   } catch (e: unknown) {
@@ -169,12 +187,14 @@ adminSuggestionRoutes.post('/:id/accept', requireRole('reviewer'), async (c) => 
 adminSuggestionRoutes.post('/:id/dismiss', requireRole('reviewer'), async (c) => {
   const id = Number(c.req.param('id'));
   const reviewerEmail = c.get('userEmail');
-  const body = await c.req.json().catch(() => ({}));
+  const parsed = await validateBody(c, dismissSuggestionSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
 
   const svc = new SuggestionService(c.env.DB);
 
   try {
-    const result = await svc.dismiss(id, reviewerEmail, body.reason);
+    const result = await svc.dismiss(id, reviewerEmail, body?.reason);
     return c.json(result);
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Unknown error';
@@ -184,10 +204,9 @@ adminSuggestionRoutes.post('/:id/dismiss', requireRole('reviewer'), async (c) =>
 
 // POST /api/admin/suggestions/bulk-dismiss — batch dismiss
 adminSuggestionRoutes.post('/bulk-dismiss', requireRole('reviewer'), async (c) => {
-  const body = await c.req.json();
-  if (!Array.isArray(body.ids) || body.ids.length === 0) {
-    return c.json({ error: 'ids array is required' }, 400);
-  }
+  const parsed = await validateBody(c, bulkDismissSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
 
   const reviewerEmail = c.get('userEmail');
   const svc = new SuggestionService(c.env.DB);

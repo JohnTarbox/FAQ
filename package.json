@@ -16,16 +16,17 @@
     "admin:build": "cd admin && npm run build"
   },
   "dependencies": {
-    "hono": "^4.7.0",
+    "@floating-ui/dom": "^1.6.0",
     "drizzle-orm": "^0.38.0",
-    "@floating-ui/dom": "^1.6.0"
+    "hono": "^4.7.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.8.0",
     "@cloudflare/workers-types": "^4.20250109.0",
     "drizzle-kit": "^0.30.0",
+    "typescript": "^5.7.0",
     "vitest": "^3.0.0",
-    "wrangler": "^4.0.0",
-    "typescript": "^5.7.0"
+    "wrangler": "^4.0.0"
   }
 }

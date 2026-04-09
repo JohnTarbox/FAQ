@@ -21,6 +21,7 @@ const categoryId = ref<number | undefined>();
 const isFeatured = ref(false);
 const sortOrder = ref(0);
 const rejectionNote = ref('');
+const successMessage = ref<string | null>(null);
 
 onMounted(async () => {
   if (!isNew.value && id.value) {
@@ -54,24 +55,36 @@ async function handleSave() {
 }
 
 async function handleSubmit() {
+  successMessage.value = null;
   if (latestVersion.value) {
-    await submitForReview(latestVersion.value.id);
-    await loadById(id.value);
+    const result = await submitForReview(latestVersion.value.id);
+    if (result) {
+      successMessage.value = 'FAQ submitted for review.';
+      await loadById(id.value);
+    }
   }
 }
 
 async function handleApprove() {
+  successMessage.value = null;
   if (latestVersion.value) {
-    await approve(latestVersion.value.id);
-    await loadById(id.value);
+    const result = await approve(latestVersion.value.id);
+    if (result) {
+      successMessage.value = 'FAQ approved and published.';
+      await loadById(id.value);
+    }
   }
 }
 
 async function handleReject() {
+  successMessage.value = null;
   if (latestVersion.value && rejectionNote.value) {
-    await reject(latestVersion.value.id, rejectionNote.value);
-    rejectionNote.value = '';
-    await loadById(id.value);
+    const result = await reject(latestVersion.value.id, rejectionNote.value);
+    if (result) {
+      successMessage.value = 'FAQ rejected and returned to author.';
+      rejectionNote.value = '';
+      await loadById(id.value);
+    }
   }
 }
 </script>
@@ -89,6 +102,7 @@ async function handleReject() {
     </div>
 
     <div v-if="error" class="error-bar">{{ error }}</div>
+    <div v-if="successMessage" class="success-bar">{{ successMessage }}</div>
 
     <div class="edit-layout">
       <div class="content-col">
@@ -178,6 +192,7 @@ async function handleReject() {
 .breadcrumb a { color: var(--color-ink-muted); }
 .breadcrumb span { margin: 0 6px; }
 .error-bar { background: var(--color-rust-pale); color: var(--color-rust); padding: 10px 16px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 14px; }
+.success-bar { background: #e8f5e9; color: #2e7d32; padding: 10px 16px; border-radius: var(--radius-sm); margin-bottom: 16px; font-size: 14px; }
 .edit-layout { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
 .content-col .section { background: var(--color-warm-white); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 24px; }
 .form-group { margin-bottom: 20px; }

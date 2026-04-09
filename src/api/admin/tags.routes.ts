@@ -4,6 +4,7 @@ import { drizzle } from 'drizzle-orm/d1';
 import type { AppEnv } from '../../index';
 import { requireRole } from '../../middleware/auth';
 import * as schema from '../../db/schema';
+import { validateBody, createTagSchema } from '../../validation';
 
 export const adminTagRoutes = new Hono<AppEnv>();
 
@@ -20,8 +21,9 @@ adminTagRoutes.get('/', async (c) => {
 
 // POST /api/admin/tags
 adminTagRoutes.post('/', requireRole('reviewer'), async (c) => {
-  const body = await c.req.json();
-  if (!body.name) return c.json({ error: 'name is required' }, 400);
+  const parsed = await validateBody(c, createTagSchema);
+  if (!parsed.success) return parsed.response;
+  const body = parsed.data;
 
   const db = drizzle(c.env.DB);
   const tag = await db.insert(schema.faqTags).values({
