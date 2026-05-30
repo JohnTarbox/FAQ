@@ -16,6 +16,10 @@ export function registerSuggestionTools(server: McpServer, env: Env, actor: Acto
   const svc = () => new SuggestionService(env.DB);
   const cache = () => new CacheService(env.CACHE);
 
+  // The AI-suggestion queue is entirely internal CMS workflow data, so even the
+  // reads require authentication (no public/anonymous surface here).
+  if (!actor.isAuthenticated) return;
+
   // ---- Reads ----
   server.tool(
     "suggestions_list",

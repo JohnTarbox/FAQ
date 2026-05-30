@@ -13,9 +13,17 @@ app at `faq.aprs.works` is untouched.
 
 | Caller | Credential | Tools | Audit actor |
 |---|---|---|---|
-| Anyone | none | read-only | — |
-| Claude Code | `Authorization: Bearer <MCP_WRITE_TOKEN>` | read + write | `MCP_ACTOR_EMAIL` |
-| claude.ai | OAuth (Okta login) | read + write | the real Okta user's email |
+| Anyone | none | **public reads** — published FAQs/terms only (search, get-by-slug, lists, categories), mirroring the website's public API | — |
+| Claude Code | `Authorization: Bearer <MCP_WRITE_TOKEN>` | public + internal reads + writes | `MCP_ACTOR_EMAIL` |
+| claude.ai | OAuth (Okta login) | public + internal reads + writes | the real Okta user's email |
+
+**Reads are tiered.** Anonymous callers only see published content (no drafts,
+no author/reviewer emails) — `faq_list`/`glossary_list` fall back to the public
+`listPublished` path and `*_get` is slug-only. The **internal** reads (version
+history, audit logs, the AI-suggestion queue, id-based lookups, all-status
+lists) require a credential, since they expose unpublished content and CMS
+metadata. Writes additionally require write capability (any authenticated Okta
+user, or the static token).
 
 **Writes are drafts only.** Every create/edit lands as a `draft` (or
 `pending_review`) and a human approves/publishes in the admin UI. There are no

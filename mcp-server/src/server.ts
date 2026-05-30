@@ -30,7 +30,7 @@ export function registerAllTools(server: McpServer, env: Env, actor: Actor): voi
         (server as unknown as { _registeredTools?: Record<string, unknown> })._registeredTools ?? {}
       );
       return jsonContent({
-        authenticated: actor.canWrite,
+        authenticated: actor.isAuthenticated,
         email: actor.email,
         role: actor.role,
         canWrite: actor.canWrite,

@@ -28,10 +28,10 @@ export function registerGlossaryTools(server: McpServer, env: Env, actor: Actor)
   const svc = () => new GlossaryService(env.DB);
   const cache = () => new CacheService(env.CACHE);
 
-  // ---- Reads ----
+  // ---- Open reads (published / public content only) ----
   server.tool(
     "glossary_list",
-    "List glossary terms (admin view, all statuses).",
+    "List glossary terms. Authenticated callers get the admin view (all statuses + filters); anonymous callers get published terms only.",
     {
       status: z.enum(["draft", "published"]).optional(),
       categoryId: z.number().int().positive().optional(),
@@ -39,15 +39,24 @@ export function registerGlossaryTools(server: McpServer, env: Env, actor: Actor)
       page: z.number().int().positive().optional(),
       limit: z.number().int().positive().max(200).optional(),
     },
-    async (args) => jsonContent(await svc().listAll(args))
+    async (args) => {
+      if (actor.isAuthenticated) return jsonContent(await svc().listAll(args));
+      // Anonymous: published-only, matching the website's public API.
+      return jsonContent(await svc().listPublished());
+    }
   );
 
   server.tool(
     "glossary_get",
-    "Get a single glossary term by numeric id (any status) or slug (published only).",
+    "Get a single published glossary term by slug. Authenticated callers may also fetch any term (any status) by numeric id.",
     { id: z.number().int().positive().optional(), slug: z.string().optional() },
     async (args) => {
-      if (args.id) return jsonContent(await svc().getById(args.id));
+      if (args.id) {
+        if (!actor.isAuthenticated) {
+          return errorContent("Fetching by id requires authentication. Use `slug` for published terms.");
+        }
+        return jsonContent(await svc().getById(args.id));
+      }
       if (args.slug) return jsonContent(await svc().getBySlug(args.slug));
       return errorContent("Provide either `id` or `slug`.");
     }

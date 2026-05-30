@@ -33,6 +33,14 @@ export interface Actor {
   /** Email used for audit trails (authorEmail / actorEmail / createdBy). */
   email: string;
   role: UserRole | "bot";
+  /**
+   * Whether the caller presented a valid credential (static token or OAuth).
+   * Gates the internal-only READ tools (drafts, version history, audit logs,
+   * the AI-suggestion pipeline, id-based lookups, all-status lists). Anonymous
+   * callers only see the public surface — published content, mirroring the
+   * website's public API.
+   */
+  isAuthenticated: boolean;
   /** Whether write tools should be registered for this caller. */
   canWrite: boolean;
 }
@@ -42,6 +50,7 @@ export function actorFromProps(props: { email: string; role: UserRole }): Actor 
   return {
     email: props.email,
     role: props.role,
+    isAuthenticated: true,
     // Any authenticated Okta user may create drafts — drafts require human
     // approval in the admin UI before publishing. Tighten to
     // hasMinRole(props.role, "reviewer") to restrict to CMS staff.
@@ -51,13 +60,14 @@ export function actorFromProps(props: { email: string; role: UserRole }): Actor 
 
 /** Actor for a static-token write (Claude Code). The secret is the gate. */
 export function actorFromStaticToken(actorEmail: string): Actor {
-  return { email: actorEmail, role: "bot", canWrite: true };
+  return { email: actorEmail, role: "bot", isAuthenticated: true, canWrite: true };
 }
 
-/** Read-only actor for unauthenticated callers. */
+/** Read-only public actor for unauthenticated callers (published content only). */
 export const ANONYMOUS_ACTOR: Actor = {
   email: "anonymous",
   role: "bot",
+  isAuthenticated: false,
   canWrite: false,
 };
 

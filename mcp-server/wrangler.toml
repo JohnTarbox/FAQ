@@ -33,15 +33,11 @@ bucket_name = "faq-glossary-images"
 binding = "CACHE"
 id = "294f05e62ae84ef4a54b085ed0b6a2bb"
 
-# OAuth state + token storage for @cloudflare/workers-oauth-provider and the
-# Okta PKCE handshake. Bound to the existing cache namespace so the Worker is
-# deployable without provisioning a new namespace; the provider and the Okta
-# handler use distinct key prefixes (grant:/token:/ vs mcp_oauth:). For
-# stronger token isolation in production, create a dedicated namespace
-# (`wrangler kv namespace create OAUTH_KV`) and replace this id.
+# Dedicated namespace for @cloudflare/workers-oauth-provider state/tokens and
+# the Okta PKCE handshake (kept separate from the app cache for token isolation).
 [[kv_namespaces]]
 binding = "OAUTH_KV"
-id = "294f05e62ae84ef4a54b085ed0b6a2bb"
+id = "b4bad829a16b48fd8fa83b67841fdc38"
 
 # McpAgent runs in a Durable Object. workers-oauth-provider routes /mcp and /sse
 # to it after issuing an access token.

@@ -13,15 +13,28 @@ function toolNames(server: ReturnType<typeof buildServer>): string[] {
   return Object.keys(reg ?? {});
 }
 
-const READ_TOOLS = [
+// Open to anonymous callers — published/public content only, mirroring the
+// website's public API.
+const OPEN_READ_TOOLS = [
   "faq_list",
   "faq_get",
   "faq_search",
+  "faq_categories_list",
+  "faq_tags_list",
   "glossary_list",
   "glossary_get",
-  "suggestions_list",
+  "glossary_search",
+  "glossary_categories_list",
   "images_list",
   "whoami",
+];
+// Internal CMS reads — require a credential (drafts, history, audit, pipeline).
+const INTERNAL_READ_TOOLS = [
+  "faq_versions",
+  "faq_audit_log",
+  "suggestions_list",
+  "suggestions_get",
+  "suggestions_stats",
 ];
 const WRITE_TOOLS = [
   "faq_create",
@@ -35,15 +48,18 @@ const WRITE_TOOLS = [
 ];
 
 describe("tool registration surface", () => {
-  it("exposes read tools but no write tools when canWrite is false", () => {
+  it("anonymous sees only the public read surface — no internal reads, no writes", () => {
     const names = toolNames(buildServer(fakeEnv, ANONYMOUS_ACTOR));
-    for (const t of READ_TOOLS) expect(names).toContain(t);
+    for (const t of OPEN_READ_TOOLS) expect(names).toContain(t);
+    for (const t of INTERNAL_READ_TOOLS) expect(names).not.toContain(t);
     for (const t of WRITE_TOOLS) expect(names).not.toContain(t);
   });
 
-  it("exposes read + write tools for a write-capable actor", () => {
+  it("an authenticated, write-capable actor sees public + internal reads + writes", () => {
     const names = toolNames(buildServer(fakeEnv, actorFromStaticToken("mcp-bot@aprsfoundation.org")));
-    for (const t of [...READ_TOOLS, ...WRITE_TOOLS]) expect(names).toContain(t);
+    for (const t of [...OPEN_READ_TOOLS, ...INTERNAL_READ_TOOLS, ...WRITE_TOOLS]) {
+      expect(names).toContain(t);
+    }
   });
 });
 

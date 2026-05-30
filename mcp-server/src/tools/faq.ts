@@ -30,10 +30,10 @@ export function registerFaqTools(server: McpServer, env: Env, actor: Actor): voi
   const cache = () => new CacheService(env.CACHE);
   const db = () => drizzle(env.DB);
 
-  // ---- Reads ----
+  // ---- Open reads (published / public content only) ----
   server.tool(
     "faq_list",
-    "List FAQ entries (admin view, all statuses). Returns the latest version of each entry.",
+    "List FAQs. Authenticated callers get the admin view (all statuses, with filters and author/reviewer metadata); anonymous callers get published FAQs only.",
     {
       status: FAQ_STATUS.optional(),
       categoryId: z.number().int().positive().optional(),
@@ -41,15 +41,25 @@ export function registerFaqTools(server: McpServer, env: Env, actor: Actor): voi
       page: z.number().int().positive().optional(),
       limit: z.number().int().positive().max(100).optional(),
     },
-    async (args) => jsonContent(await svc().listAll(args))
+    async (args) => {
+      if (actor.isAuthenticated) return jsonContent(await svc().listAll(args));
+      // Anonymous: published-only, no author/reviewer emails — matches the
+      // website's public API (FaqService.listPublished).
+      return jsonContent(await svc().listPublished({ page: args.page, limit: args.limit }));
+    }
   );
 
   server.tool(
     "faq_get",
-    "Get a single FAQ by numeric id (any status) or by slug (published only).",
+    "Get a single published FAQ by slug. Authenticated callers may also fetch any entry (any status) by numeric id.",
     { id: z.number().int().positive().optional(), slug: z.string().optional() },
     async (args) => {
-      if (args.id) return jsonContent(await svc().getById(args.id));
+      if (args.id) {
+        if (!actor.isAuthenticated) {
+          return errorContent("Fetching by id requires authentication. Use `slug` for published FAQs.");
+        }
+        return jsonContent(await svc().getById(args.id));
+      }
       if (args.slug) return jsonContent(await svc().getBySlug(args.slug));
       return errorContent("Provide either `id` or `slug`.");
     }
@@ -67,19 +77,22 @@ export function registerFaqTools(server: McpServer, env: Env, actor: Actor): voi
       jsonContent(await new SearchService(env.DB).searchFaq(args.query, args.limit, args.offset))
   );
 
-  server.tool(
-    "faq_versions",
-    "List all versions of a FAQ entry, newest first.",
-    { entryId: z.number().int().positive() },
-    async (args) => jsonContent(await svc().getVersions(args.entryId))
-  );
+  // ---- Internal reads (drafts, history, audit) — authenticated only ----
+  if (actor.isAuthenticated) {
+    server.tool(
+      "faq_versions",
+      "List all versions of a FAQ entry, newest first (includes drafts + author/reviewer emails).",
+      { entryId: z.number().int().positive() },
+      async (args) => jsonContent(await svc().getVersions(args.entryId))
+    );
 
-  server.tool(
-    "faq_audit_log",
-    "Get the audit log (created/updated/approved/...) for a FAQ entry.",
-    { entryId: z.number().int().positive() },
-    async (args) => jsonContent(await svc().getAuditLog(args.entryId))
-  );
+    server.tool(
+      "faq_audit_log",
+      "Get the audit log (created/updated/approved/...) for a FAQ entry (includes actor emails).",
+      { entryId: z.number().int().positive() },
+      async (args) => jsonContent(await svc().getAuditLog(args.entryId))
+    );
+  }
 
   server.tool("faq_categories_list", "List all FAQ categories.", {}, async () =>
     jsonContent(
