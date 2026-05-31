@@ -4,6 +4,9 @@ A second Cloudflare Worker that exposes the FAQ/Glossary data to Claude via the
 Model Context Protocol — usable both from **claude.ai** (remote connector, OAuth
 via Okta) and **Claude Code** (`.mcp.json`, static bearer token).
 
+> **Just want to connect and use it?** See [CONNECTING.md](./CONNECTING.md).
+> The rest of this file is for developing/operating the server itself.
+
 It reuses the main app's service classes (`FaqService`, `GlossaryService`,
 `SuggestionService`, `SearchService`, `ImageService`) by importing them from
 `../src/services/*`, and binds the **same** D1/KV/R2 as the main app. The main
