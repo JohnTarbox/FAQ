@@ -157,7 +157,11 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const auth = request.headers.get("Authorization");
-    const route = classifyRequest(request.method, url.pathname, auth, env.MCP_WRITE_TOKEN);
+    // Anonymous read access is an explicit opt-in (?anon=1). A bare /mcp with no
+    // token instead falls through to the OAuth provider's 401 challenge, which
+    // is what claude.ai / cowork needs to launch the Okta login.
+    const allowAnon = url.searchParams.get("anon") === "1";
+    const route = classifyRequest(request.method, url.pathname, auth, env.MCP_WRITE_TOKEN, allowAnon);
 
     switch (route) {
       case "info":

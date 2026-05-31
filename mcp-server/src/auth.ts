@@ -1,14 +1,22 @@
 /**
  * Actor resolution + request classification for the MCP Worker.
  *
- * Reads are open; writes require a credential. There are three credential
- * paths, classified by `classifyRequest()` purely from method/path/headers:
- *   - open-read   : no Authorization header → read-only tool set
+ * Writes require a credential; public reads are available but as an explicit
+ * opt-in. Paths are classified by `classifyRequest()` from method/path/headers:
  *   - static-write: Authorization === `Bearer <MCP_WRITE_TOKEN>` → full tools,
  *                   synthetic bot actor (Claude Code via .mcp.json)
- *   - oauth       : anything else (incl. provider-issued Bearer tokens, the
- *                   /authorize|/token|/register|/callback OAuth dance) → handed
- *                   to workers-oauth-provider, which yields a real Okta identity
+ *   - open-read   : `?anon=1` and no Authorization → read-only tool set
+ *   - oauth       : DEFAULT — incl. a *missing* token (no `?anon=1`), an
+ *                   invalid/other Bearer, and the /authorize|/token|/register|
+ *                   /callback dance → handed to workers-oauth-provider.
+ *
+ * Why missing-token defaults to oauth instead of anonymous: OAuth-capable
+ * clients (claude.ai / Claude cowork) only start their login flow when an
+ * unauthenticated request returns 401 + WWW-Authenticate. If a missing token
+ * silently returned 200 + anonymous tools, the client would conclude no auth is
+ * needed and never prompt for Okta login. So the default no-credential request
+ * is handed to the provider (which emits that 401 challenge), and anonymous
+ * read access is reachable explicitly via `?anon=1`.
  */
 
 // Mirrors src/middleware/auth.ts in the main app. Re-implemented here (rather
@@ -77,21 +85,24 @@ export type RequestRoute = "info" | "version" | "open-read" | "static-write" | "
  * Pure routing decision for the top-level fetch handler. Order matters:
  * a non-matching Bearer (e.g. a provider-issued OAuth token) MUST fall through
  * to "oauth", never be treated as unauthorized here — claude.ai sends its
- * issued access token as `Bearer` on every /mcp request.
+ * issued access token as `Bearer` on every /mcp request. A *missing* token also
+ * falls through to "oauth" (so the provider issues the 401 challenge) unless
+ * the caller explicitly opted into anonymous access via `allowAnon` (?anon=1).
  */
 export function classifyRequest(
   method: string,
   pathname: string,
   authHeader: string | null,
-  writeToken: string | undefined
+  writeToken: string | undefined,
+  allowAnon: boolean
 ): RequestRoute {
   if (method === "GET" && pathname === "/") return "info";
   if (method === "GET" && pathname === "/version") return "version";
 
   const isMcpPath = pathname === "/mcp" || pathname === "/sse";
   if (isMcpPath) {
-    if (!authHeader) return "open-read";
     if (writeToken && authHeader === `Bearer ${writeToken}`) return "static-write";
+    if (!authHeader && allowAnon) return "open-read";
   }
   return "oauth";
 }

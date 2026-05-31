@@ -6,10 +6,12 @@ The server is live at:
 https://mcp.faq.aprs.works/mcp
 ```
 
-It lets Claude read and write the APRS FAQ/Glossary content. **Reads of
-published content are open; writes (and internal reads like drafts/audit logs)
-require a credential. Writes always land as drafts** for a human to approve in
-the admin UI — Claude can't publish.
+It lets Claude read and write the APRS FAQ/Glossary content. **Published content
+is readable anonymously (via `?anon=1`); writes (and internal reads like
+drafts/audit logs) require a credential. Writes always land as drafts** for a
+human to approve in the admin UI — Claude can't publish. A bare `/mcp` with no
+credential returns a 401 OAuth challenge (so claude.ai prompts for login) rather
+than serving anonymously — see the tiers below.
 
 ## Access tiers
 
@@ -17,7 +19,7 @@ the admin UI — Claude can't publish.
 |---|---|---|
 | **claude.ai / Claude cowork** | Okta login (OAuth) | read + write (drafts), as *you* |
 | **Claude Code (CLI)** | static bearer token | read + write (drafts), as the MCP bot |
-| Any MCP client, no auth | none | read **published** content only |
+| Any MCP client, `/mcp?anon=1` | none | read **published** content only |
 
 ---
 
@@ -79,8 +81,10 @@ Then **restart Claude Code**. Verify with `/mcp` (it should list `faq` as
 connected) or ask Claude to run the `whoami` tool — `role` will be `bot`,
 `canWrite: true`.
 
-**Read-only (no token):** omit the `Authorization` header entirely. You'll get
-the 11 public read tools only.
+**Read-only (no token):** use the URL `https://mcp.faq.aprs.works/mcp?anon=1`
+(no `Authorization` header) → the 11 public read tools only. Note: a bare
+`/mcp` with no token returns a 401 OAuth challenge (that's what makes claude.ai
+start the Okta flow), so anonymous access needs the explicit `?anon=1`.
 
 ---
 
