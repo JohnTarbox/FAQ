@@ -35,6 +35,26 @@ jobs:
       - name: Dry-run deploy
         run: npm run build
 
+  # The MCP server is a separate workspace (mcp-server/). Run its type-check and
+  # tests in their own job so they report independently of the main worker job.
+  mcp-server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Type-check MCP server
+        run: npm run typecheck --workspace mcp-server
+
+      - name: Run MCP server tests
+        run: npm test --workspace mcp-server
+
   deploy:
     needs: test
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
