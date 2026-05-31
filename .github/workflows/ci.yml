@@ -59,13 +59,13 @@ jobs:
       - name: Run MCP server tests
         run: npm test --workspace mcp-server
 
-  # Manual-only, pinned to master: does NOT run on pushes/PRs, and a manual
-  # "Run workflow" only deploys when dispatched against the master ref (so a
-  # side branch can't be pushed to production). Requires a CLOUDFLARE_API_TOKEN
-  # repo secret; otherwise day-to-day deploys continue via local `wrangler deploy`.
+  # Auto-deploys the main FAQ app on every push to master (e.g. a merged PR),
+  # and is also available as a manual "Run workflow". Pinned to the master ref
+  # so a side branch can't be deployed. Uses the CLOUDFLARE_API_TOKEN repo
+  # secret. Runs only after `test` passes.
   deploy:
     needs: test
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/master' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
