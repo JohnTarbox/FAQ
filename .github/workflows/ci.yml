@@ -26,11 +26,14 @@ jobs:
       - name: Type-check admin
         run: cd admin && npx vue-tsc --noEmit
 
-      - name: Run tests
-        run: npm test
-
+      # Build the admin SPA before tests: vitest-pool-workers loads
+      # wrangler.toml, whose [assets] directory = "./dist" must exist or
+      # Miniflare's config validation throws.
       - name: Build admin SPA
         run: npm run admin:build
+
+      - name: Run tests
+        run: npm test
 
       - name: Dry-run deploy
         run: npm run build
