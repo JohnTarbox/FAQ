@@ -30,6 +30,7 @@ import {
   type ConnectionLike,
   type TransportPrivates,
 } from "./transport-collision-fix";
+import { enforceRateLimit } from "./ratelimit";
 import type { Env, UserProps } from "./env";
 
 const DEFAULT_ACTOR_EMAIL = "mcp-bot@aprsfoundation.org";
@@ -163,8 +164,11 @@ export default {
         return infoJson({ ...SERVER_INFO, description: "FAQ/Glossary MCP server" });
       case "version":
         return infoJson({ ...SERVER_INFO });
-      case "open-read":
-        return handleOpenReadMcp(request, env);
+      case "open-read": {
+        // Anonymous reads only: throttle per client IP to protect D1.
+        const limited = await enforceRateLimit(env.READ_RATE_LIMITER, request);
+        return limited ?? handleOpenReadMcp(request, env);
+      }
       case "static-write":
         return handleStaticTokenMcp(request, env);
       case "oauth":

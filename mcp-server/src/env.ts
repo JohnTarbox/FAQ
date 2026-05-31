@@ -22,6 +22,9 @@ export interface Env {
   MCP_WRITE_TOKEN: string;
   /** Audit actor used for static-token writes (no human identity). */
   MCP_ACTOR_EMAIL?: string;
+
+  /** Per-IP rate limiter for the anonymous public-read surface (optional). */
+  READ_RATE_LIMITER?: import("./ratelimit").RateLimiter;
 }
 
 /**
