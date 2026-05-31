@@ -1,0 +1,5 @@
+# Copy to .dev.vars for `wrangler dev`. Do NOT commit .dev.vars.
+# Generate a strong write token: openssl rand -base64 32
+MCP_WRITE_TOKEN="dev-write-token-change-me"
+OKTA_CLIENT_ID="your-okta-client-id"
+OKTA_CLIENT_SECRET="your-okta-client-secret"

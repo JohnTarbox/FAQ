@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022"],
+    "types": ["@cloudflare/workers-types"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true
+  },
+  // src/** plus the main app's services/validation/schema that we reuse via
+  // relative import (../../src/...). tsc follows the imports automatically,
+  // but listing them keeps editor tooling happy.
+  "include": ["src/**/*.ts", "__tests__/**/*.ts"]
+}

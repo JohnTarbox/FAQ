@@ -1,0 +1,67 @@
+name = "faq-glossary-mcp"
+main = "src/index.ts"
+# Matches the proven agents@0.8.7 + workers-oauth-provider@0.3.3 +
+# @modelcontextprotocol/sdk@1.12.1 combination used by the sister project's
+# remote MCP connector. nodejs_compat is required by the agents SDK.
+compatibility_date = "2026-04-21"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+
+# Custom domain for the claude.ai connector. Requires the aprs.works zone to be
+# on this Cloudflare account (it is — the main app serves faq.aprs.works).
+[[routes]]
+pattern = "mcp.faq.aprs.works"
+custom_domain = true
+
+# Same D1 database as the main app — the MCP tools reuse the main app's service
+# classes (FaqService, GlossaryService, ...) which create their own Drizzle
+# instance from this binding.
+[[d1_databases]]
+binding = "DB"
+database_name = "faq-glossary-db"
+database_id = "6069ca96-833e-4115-85b8-4c53dc106469"
+
+# Same R2 bucket as the main app — image_upload / image_delete write here, and
+# the main app serves them at /images/*.
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "faq-glossary-images"
+
+# Same KV cache as the main app — write tools call CacheService.invalidate*()
+# after mutations so the public read API serves fresh data.
+[[kv_namespaces]]
+binding = "CACHE"
+id = "294f05e62ae84ef4a54b085ed0b6a2bb"
+
+# Dedicated namespace for @cloudflare/workers-oauth-provider state/tokens and
+# the Okta PKCE handshake (kept separate from the app cache for token isolation).
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "b4bad829a16b48fd8fa83b67841fdc38"
+
+# McpAgent runs in a Durable Object. workers-oauth-provider routes /mcp and /sse
+# to it after issuing an access token.
+[durable_objects]
+bindings = [
+  { name = "MCP_OBJECT", class_name = "FaqMcp" }
+]
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["FaqMcp"]
+
+[vars]
+ENVIRONMENT = "production"
+OKTA_DOMAIN = "aprsfoundation.okta.com"
+# Audit actor used when a write arrives via the static MCP_WRITE_TOKEN (Claude
+# Code). claude.ai writes use the real Okta email instead.
+MCP_ACTOR_EMAIL = "mcp-bot@aprsfoundation.org"
+
+# Secrets (set via `wrangler secret put`, never committed):
+#   MCP_WRITE_TOKEN   — static bearer that gates writes from Claude Code
+#   OKTA_CLIENT_ID    — Okta OIDC app client id (claude.ai OAuth → Okta)
+#   OKTA_CLIENT_SECRET— Okta OIDC app client secret
+# For local dev, put these in mcp-server/.dev.vars (gitignored).
+
+[dev]
+port = 8788
